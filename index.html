@@ -1,882 +1,528 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Demo Tienda por WhatsApp</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda WhatsApp | Demo Profesional</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root{
-      --bg:#070b14;
-      --panel:#0f1b33;
-      --panel2:#0c162b;
-      --text:#e6edf7;
-      --muted:#9fb0c6;
-      --border:rgba(159,176,198,.18);
-      --accent:#22c55e;
-      --danger:#ef4444;
-      --warn:#f59e0b;
-      --shadow: 0 10px 35px rgba(0,0,0,.35);
-      --radius:14px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-      background: radial-gradient(1200px 600px at 30% -20%, rgba(34,197,94,.18), transparent 60%),
-                  radial-gradient(900px 500px at 110% 20%, rgba(245,158,11,.14), transparent 55%),
-                  linear-gradient(180deg, #050813, var(--bg));
-      color:var(--text);
-    }
-    a{color:inherit}
-    header{
-      position:sticky; top:0; z-index:10;
-      background:rgba(5,8,19,.82);
-      backdrop-filter:saturate(180%) blur(10px);
-      border-bottom:1px solid var(--border);
-    }
-    .wrap{max-width:1200px;margin:0 auto;padding:14px 16px}
-    .top{
-      display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-    }
-    .brand{display:flex; flex-direction:column; gap:2px}
-    .brand h1{margin:0;font-size:16px;letter-spacing:.2px}
-    .brand small{color:var(--muted)}
-    .chiprow{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-    .chip{
-      display:flex; gap:10px; align-items:center;
-      border:1px solid var(--border);
-      border-radius:999px;
-      padding:8px 12px;
-      background:rgba(15,27,51,.65);
-      box-shadow: 0 8px 25px rgba(0,0,0,.15);
-      font-size:13px;
-    }
-    .chip b{font-variant-numeric: tabular-nums}
-    .chip .dot{width:8px;height:8px;border-radius:999px;background:var(--accent)}
-    main .grid{
-      display:grid;
-      grid-template-columns: 1.35fr .65fr;
-      gap:14px;
-      align-items:start;
-    }
-    @media (max-width: 980px){ main .grid{grid-template-columns:1fr} }
-
-    .panel{
-      background:rgba(15,27,51,.78);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      overflow:hidden;
-      box-shadow: var(--shadow);
-    }
-    .panel h2{
-      margin:0;
-      padding:12px 14px;
-      font-size:14px;
-      border-bottom:1px solid var(--border);
-      background:linear-gradient(180deg, rgba(12,22,43,.4), rgba(12,22,43,.0));
-    }
-    .panel .content{padding:14px}
-    .controls{
-      display:grid;
-      grid-template-columns: 1fr 220px;
-      gap:10px;
-      margin-bottom:12px;
-    }
-    @media (max-width: 560px){ .controls{grid-template-columns:1fr} }
-    input, select, textarea{
-      width:100%;
-      padding:10px 10px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      background:rgba(12,22,43,.55);
-      color:var(--text);
-      outline:none;
-    }
-    textarea{min-height:70px;resize:vertical}
-    input::placeholder, textarea::placeholder{color:rgba(159,176,198,.7)}
-    .products{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap:12px;
-    }
-    @media (max-width: 980px){ .products{grid-template-columns: repeat(2, minmax(0,1fr))} }
-    @media (max-width: 560px){ .products{grid-template-columns:1fr} }
-
-    .card{
-      border:1px solid var(--border);
-      border-radius:14px;
-      overflow:hidden;
-      background:rgba(12,22,43,.5);
-      display:flex;
-      flex-direction:column;
-      min-height: 100%;
-    }
-    .card img{
-      width:100%;
-      height:160px;
-      object-fit:cover;
-      background:#0b1220;
-      display:block;
-    }
-    .card .meta{
-      padding:10px 10px 12px 10px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      flex:1;
-    }
-    .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-    .name{font-size:14px;margin:0}
-    .badge{
-      font-size:11px;
-      color:var(--muted);
-      border:1px solid var(--border);
-      padding:4px 8px;
-      border-radius:999px;
-      white-space:nowrap;
-      background:rgba(15,27,51,.45);
-    }
-    .desc{margin:0;color:var(--muted);font-size:12px;line-height:1.35}
-    .price{
-      font-variant-numeric: tabular-nums;
-      font-weight:700;
-      font-size:14px;
-    }
-    .btnrow{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:auto}
-    button{
-      cursor:pointer;
-      border-radius:12px;
-      border:1px solid var(--border);
-      background:rgba(15,27,51,.6);
-      color:var(--text);
-      padding:10px 10px;
-      font-weight:600;
-    }
-    button.primary{
-      background:rgba(34,197,94,.16);
-      border-color: rgba(34,197,94,.45);
-    }
-    button.danger{
-      background:rgba(239,68,68,.14);
-      border-color: rgba(239,68,68,.45);
-    }
-    button:disabled{opacity:.5;cursor:not-allowed}
-
-    .cartlist{display:flex;flex-direction:column;gap:10px}
-    .cartitem{
-      border:1px solid var(--border);
-      border-radius:14px;
-      background:rgba(12,22,43,.5);
-      padding:10px;
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-    }
-    .thumb{
-      width:56px;height:56px;border-radius:12px;object-fit:cover;background:#0b1220;
-      border:1px solid rgba(255,255,255,.06);
-      flex:0 0 auto;
-    }
-    .cartmeta{flex:1;display:flex;flex-direction:column;gap:6px}
-    .cartmeta .title{margin:0;font-size:13px}
-    .cartmeta .sub{color:var(--muted);font-size:12px}
-    .qtyrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .qtybtn{padding:6px 10px;border-radius:10px}
-    .qty{
-      min-width:32px;text-align:center;font-variant-numeric: tabular-nums;
-      padding:6px 10px;border-radius:10px;border:1px solid var(--border);
-      background:rgba(15,27,51,.45);
-    }
-    .totals{
-      margin-top:12px;
-      border-top:1px solid var(--border);
-      padding-top:12px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-    .line{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px}
-    .line strong{color:var(--text)}
-    .help{
-      margin-top:10px;
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.35;
-    }
-    .warnbox{
-      border:1px solid rgba(245,158,11,.35);
-      background:rgba(245,158,11,.08);
-      padding:10px;
-      border-radius:14px;
-      color:rgba(255,255,255,.9);
-      font-size:12px;
-      line-height:1.35;
-    }
-    .footerbar{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
-      margin-top:10px;
-    }
-    .smallbtn{padding:8px 10px;font-size:12px;border-radius:12px}
-    .muted{color:var(--muted)}
+    :root { --btn: #000000; --txt: #000000; --bg: #f9fafb; }
+    body { background-color: var(--bg); color: var(--txt); font-family: system-ui, -apple-system, sans-serif; }
+    .btn-principal { background-color: var(--btn) !important; color: white; }
+    .modal-animate { animation: slideUp 0.3s ease-out; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
   </style>
 </head>
 
-<body>
-<header>
-  <div class="wrap">
-    <div class="top">
-      <div class="brand">
-        <h1>Demo — Tienda por WhatsApp (Carrito + Pedido)</h1>
-        <small>Selecciona productos, completa tus datos y envía el pedido por WhatsApp al vendedor.</small>
-      </div>
-      <div class="chiprow">
-        <div class="chip"><span class="dot"></span><span>Vendedor:</span> <b id="sellerPhoneLabel"></b></div>
-        <div class="chip"><span>Items:</span> <b id="cartCount">0</b></div>
-        <div class="chip"><span>Total:</span> <b id="cartTotal">$0</b></div>
-      </div>
+<body class="pb-20">
+<header class="bg-white sticky top-0 z-40 border-b shadow-sm">
+  <div class="max-w-md mx-auto px-5 py-4 flex justify-between items-center">
+    <div class="leading-tight">
+      <h1 class="text-xl font-black italic tracking-tighter uppercase">TIENDA DEMO 🛍️</h1>
+      <p class="text-[11px] text-gray-500 font-semibold -mt-0.5">Pedido por WhatsApp · sin pagos integrados</p>
     </div>
+    <button onclick="toggleCart()" class="relative p-2 bg-gray-100 rounded-full">
+      <i class="fa-solid fa-shopping-bag text-xl"></i>
+      <span id="cart-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+    </button>
+  </div>
+
+  <div class="max-w-md mx-auto px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-t bg-white">
+    <button onclick="filterCat('Ropa')" class="cat-btn bg-black text-white px-5 py-2 rounded-full text-xs font-bold shrink-0">Ropa</button>
+    <button onclick="filterCat('Belleza')" class="cat-btn bg-gray-100 text-black px-5 py-2 rounded-full text-xs font-bold shrink-0">Belleza</button>
+    <button onclick="filterCat('Hogar')" class="cat-btn bg-gray-100 text-black px-5 py-2 rounded-full text-xs font-bold shrink-0">Hogar</button>
+    <button onclick="filterCat('Accesorios')" class="cat-btn bg-gray-100 text-black px-5 py-2 rounded-full text-xs font-bold shrink-0">Accesorios</button>
   </div>
 </header>
 
-<main class="wrap">
-  <div class="grid">
-    <!-- Catálogo -->
-    <section class="panel">
-      <h2>Catálogo</h2>
-      <div class="content">
-        <div class="controls">
-          <input id="search" type="search" placeholder="Buscar por nombre o detalle (ej. 'algodón', 'café', 'fitness')…" />
-          <select id="category">
-            <option value="__all__">Todas las categorías</option>
-          </select>
-        </div>
-
-        <div id="products" class="products"></div>
-
-        <div class="help">
-          Tip: esta demo usa fotos públicas aleatorias (picsum.photos). En tu versión real, cambia la propiedad <b>image</b> de cada producto por tu URL o por <code>img/tu-foto.jpg</code>.
-        </div>
-      </div>
-    </section>
-
-    <!-- Carrito + Checkout -->
-    <aside class="panel">
-      <h2>Carrito y pedido</h2>
-      <div class="content">
-        <div id="cartEmpty" class="warnbox">
-          Tu carrito está vacío. Agrega productos del catálogo para poder enviar el pedido.
-        </div>
-
-        <div id="cart" class="cartlist" style="display:none;"></div>
-
-        <div class="totals">
-          <div class="line"><span>Subtotal</span><strong id="subtotal">$0</strong></div>
-          <div class="line"><span>Envío</span><strong id="shipping">$0</strong></div>
-          <div class="line"><span>Total</span><strong id="total">$0</strong></div>
-        </div>
-
-        <div class="footerbar">
-          <button class="smallbtn danger" id="clearCartBtn" type="button">Vaciar carrito</button>
-          <span class="muted" style="font-size:12px;">Se guarda automáticamente</span>
-        </div>
-
-        <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">
-
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <input id="custName" placeholder="Tu nombre" autocomplete="name" />
-          <input id="custPhone" placeholder="Tu teléfono (con prefijo si quieres)" autocomplete="tel" />
-          <textarea id="custAddress" placeholder="Dirección completa (calle, número, colonia, ciudad, CP)…" autocomplete="street-address"></textarea>
-          <textarea id="custNotes" placeholder="Notas (horario, referencias, sabor, talla/color, etc.) (opcional)"></textarea>
-
-          <button id="whatsBtn" class="primary" type="button" disabled>
-            Enviar pedido por WhatsApp
-          </button>
-
-          <div class="help">
-            Al enviar, se abrirá WhatsApp con el mensaje armado. El vendedor luego te compartirá su enlace de pago.
-          </div>
-        </div>
-      </div>
-    </aside>
+<main class="max-w-md mx-auto px-5 py-4">
+  <div class="mb-4 flex gap-2">
+    <div class="flex-1 relative">
+      <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+      <input id="search" oninput="applySearch()" placeholder="Buscar (ej. 'algodón', 'vainilla', 'negro')"
+             class="w-full pl-9 pr-3 py-3 bg-white border rounded-2xl text-sm font-semibold shadow-sm">
+    </div>
+    <button onclick="clearSearch()" class="px-4 py-3 bg-gray-100 border rounded-2xl text-sm font-black">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
   </div>
 
-  <div style="margin-top:14px;color:var(--muted);font-size:12px;">
-    Demo educativa. No se almacenan pedidos en servidor: todo se arma en tu navegador y se envía por WhatsApp.
-  </div>
+  <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
+
+  <p class="text-[11px] text-gray-500 font-semibold mt-5">
+    Tip: en producción cambias las imágenes por tus URLs o por <span class="font-black">/img/foto.jpg</span>.
+  </p>
 </main>
 
+<!-- Product modal -->
+<div id="product-modal" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-end sm:items-center justify-center backdrop-blur-sm">
+  <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] p-6 max-h-[90vh] overflow-y-auto modal-animate">
+    <div class="flex justify-between items-center mb-4">
+      <h3 id="modal-p-nombre" class="text-xl font-black uppercase"></h3>
+      <button onclick="closeProductModal()" class="text-3xl text-gray-300">&times;</button>
+    </div>
+    <img id="modal-p-img" src="" class="w-full aspect-square object-cover rounded-[2rem] mb-4 shadow-md">
+    <p id="modal-p-desc" class="text-gray-500 text-sm mb-6"></p>
+
+    <div id="variantes-container" class="space-y-6 mb-8"></div>
+
+    <div class="flex items-center justify-between gap-4 sticky bottom-0 bg-white pt-3 border-t">
+      <span id="modal-p-precio" class="text-2xl font-black"></span>
+      <button id="add-from-modal" class="flex-grow btn-principal py-4 rounded-2xl font-bold uppercase text-xs tracking-widest">
+        Añadir
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Cart modal -->
+<div id="cart-modal" class="fixed inset-0 bg-black/50 z-[70] hidden backdrop-blur-sm">
+  <div class="bg-white w-full max-w-sm h-full ml-auto flex flex-col p-6 shadow-2xl overflow-y-auto">
+    <div class="flex justify-between items-center border-b pb-4 mb-4">
+      <h2 class="text-xl font-black uppercase">Tu Carrito</h2>
+      <button onclick="toggleCart()" class="text-3xl text-gray-300">&times;</button>
+    </div>
+
+    <div id="cart-items" class="space-y-3 mb-6"></div>
+
+    <div class="space-y-4 border-t pt-4">
+      <div class="flex gap-2">
+        <button onclick="vaciarCarrito()" class="w-full py-3 rounded-2xl font-black text-xs uppercase border bg-gray-50">
+          Vaciar carrito
+        </button>
+        <button onclick="toggleCart()" class="w-full py-3 rounded-2xl font-black text-xs uppercase border bg-white">
+          Seguir comprando
+        </button>
+      </div>
+
+      <div>
+        <label class="text-[10px] font-bold uppercase text-gray-400">Tipo de Entrega</label>
+        <select id="entrega-modo" onchange="onEntregaModoChange()" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm mt-1">
+          <option value="Domicilio">A Domicilio 🏠</option>
+          <option value="Recoger">Para Recoger 🥡</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-[10px] font-bold uppercase text-gray-400">¿Para cuándo?</label>
+        <select id="entrega-tipo" onchange="document.getElementById('entrega-hora').classList.toggle('hidden', this.value !== 'Programar'); saveForm()" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm mt-1">
+          <option value="Lo antes posible">Lo antes posible ⚡</option>
+          <option value="Programar">Seleccionar hora ⏰</option>
+        </select>
+        <select id="entrega-hora" onchange="saveForm()" class="hidden w-full p-3 mt-2 bg-gray-50 border rounded-xl font-bold text-sm text-blue-600"></select>
+      </div>
+
+      <div>
+        <label class="text-[10px] font-bold uppercase text-gray-400">Método de Pago</label>
+        <select id="pago-metodo" onchange="saveForm()" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm mt-1">
+          <option value="Efectivo">Efectivo 💵</option>
+          <option value="Tarjeta">Tarjeta (Datafono) 💳</option>
+          <option value="Transferencia">Transferencia 🏦</option>
+        </select>
+      </div>
+
+      <textarea id="cust-notes" oninput="saveForm()" placeholder="Notas (talla, color, referencias, alergias...)" class="w-full p-3 bg-gray-50 border rounded-xl text-sm h-16"></textarea>
+      <input type="text" id="cust-name" oninput="saveForm()" placeholder="Tu Nombre" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
+      <input type="tel" id="cust-phone" oninput="saveForm()" placeholder="Tu Teléfono" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
+
+      <div id="address-wrap">
+        <input type="text" id="cust-address" oninput="saveForm()" placeholder="Dirección completa" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
+        <p class="text-[11px] text-gray-500 font-semibold mt-2">
+          Si eliges <span class="font-black">“Para Recoger”</span>, la dirección no es obligatoria.
+        </p>
+      </div>
+
+      <div class="flex justify-between text-2xl font-black pt-2">
+        <span>TOTAL:</span>
+        <span id="total-val">0.00€</span>
+      </div>
+
+      <button onclick="enviarPedido()" class="w-full btn-principal py-5 rounded-2xl font-black text-sm uppercase flex items-center justify-center gap-3 mb-10">
+        <i class="fa-brands fa-whatsapp text-2xl"></i> HACER PEDIDO
+      </button>
+
+      <p class="text-[11px] text-gray-500 font-semibold -mt-6">
+        No se guarda el pedido en servidor: se envía por WhatsApp y el vendedor te manda el enlace de pago.
+      </p>
+    </div>
+  </div>
+</div>
+
 <script>
-/** =========================
- *  Configuración
- *  ========================= */
-const SELLER_PHONE_E164 = "34633817413"; // +34 633 817 413 -> wa.me exige sin "+"
-const SELLER_DISPLAY = "+34 633 817 413";
+  /** CONFIG */
+  const WHATSAPP_VENDEDOR = "34633817413"; // +34 633 817 413 -> wa.me sin "+"
+  const MONEDA = "€";
 
-// Ajusta moneda a tu gusto: "MXN", "EUR", etc.
-const CURRENCY = "EUR";
+  /** DEMO DATA (4 categorías, 6+ productos cada una) */
+  const PRODUCTOS = [
+    // ROPA (6)
+    { cat:"Ropa", nombre:"Playera Básica Algodón", precio:12.90, desc:"Algodón suave, corte unisex. Ideal para diario.", img:"https://images.unsplash.com/photo-1520975661595-6453be3f7070?w=700", Talla:"S, M, L, XL", Color:"Negro, Blanco, Gris" },
+    { cat:"Ropa", nombre:"Sudadera Oversize", precio:29.90, desc:"Interior afelpado, look urbano.", img:"https://images.unsplash.com/photo-1520975958225-ff7f128a02e9?w=700", Talla:"S, M, L, XL", Color:"Negro, Arena" },
+    { cat:"Ropa", nombre:"Gorra Bordada", precio:14.50, desc:"Ajustable, bordado frontal.", img:"https://images.unsplash.com/photo-1520975687960-5f5b89a1cdd6?w=700", Color:"Negro, Beige, Azul" },
+    { cat:"Ropa", nombre:"Calcetas Deportivas (Pack x3)", precio:9.90, desc:"Transpirables, soporte en arco.", img:"https://images.unsplash.com/photo-1582738412142-75b1a36c5c2d?w=700", Talla:"CH, M, G" },
+    { cat:"Ropa", nombre:"Tote Bag Resistente", precio:11.00, desc:"Lona gruesa, ideal para mandado o escuela.", img:"https://images.unsplash.com/photo-1520975680963-9b3cbb6f0a77?w=700", Color:"Natural, Negro" },
+    { cat:"Ropa", nombre:"Rompevientos Ligero", precio:34.90, desc:"Ligero y cómodo, para clima variable.", img:"https://images.unsplash.com/photo-1520975749810-05e25f4c7d11?w=700", Talla:"S, M, L, XL" },
 
-// En esta demo el envío es 0 (puedes cambiarlo a número fijo o calcularlo).
-const SHIPPING_FLAT = 0;
+    // BELLEZA (6)
+    { cat:"Belleza", nombre:"Kit Skincare (Mini)", precio:18.00, desc:"Rutina básica: limpieza + hidratación (tamaño viaje).", img:"https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=700", Tipo:"Piel seca, Piel mixta, Piel grasa" },
+    { cat:"Belleza", nombre:"Bálsamo Labial", precio:4.50, desc:"Hidratación diaria, aroma suave.", img:"https://images.unsplash.com/photo-1612810436541-336d7c0f7fd6?w=700", Sabor:"Vainilla, Menta, Coco" },
+    { cat:"Belleza", nombre:"Perfume Roll-on 10ml", precio:9.90, desc:"Fragancia práctica para bolsa.", img:"https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=700", Modelo:"Dulce, Fresco, Amaderado" },
+    { cat:"Belleza", nombre:"Crema de Manos", precio:6.90, desc:"Rápida absorción, no grasosa.", img:"https://images.unsplash.com/photo-1585232351009-aa87416fca90?w=700", Sabor:"Karité, Almendra" },
+    { cat:"Belleza", nombre:"Jabón Artesanal", precio:5.20, desc:"Hecho a mano. Suave con la piel.", img:"https://images.unsplash.com/photo-1607006344380-b6775a0824ce?w=700", Tipo:"Avena, Lavanda, Carbón" },
+    { cat:"Belleza", nombre:"Serum Vitamina C", precio:16.90, desc:"Ilumina y unifica (uso diario).", img:"https://images.unsplash.com/photo-1611930022073-84fbbd9f19b1?w=700", Tipo:"Suave, Concentrado" },
 
-/** =========================
- *  Catálogo (18 productos: 3 categorías x 6)
- *  Fotos: picsum.photos (públicas)
- *  ========================= */
-const PRODUCTS = [
-  // --- Ropa (6) ---
-  {
-    id: "ropa-001",
-    category: "Ropa",
-    name: "Playera Premium Algodón",
-    price: 18.99,
-    image: "https://picsum.photos/seed/playera-premium/800/520",
-    description: "Algodón peinado, corte unisex. Ideal para diario."
-  },
-  {
-    id: "ropa-002",
-    category: "Ropa",
-    name: "Sudadera Oversize",
-    price: 34.50,
-    image: "https://picsum.photos/seed/sudadera-oversize/800/520",
-    description: "Felpa suave, estilo urbano. Tallas S–XL."
-  },
-  {
-    id: "ropa-003",
-    category: "Ropa",
-    name: "Gorra Bordada",
-    price: 14.00,
-    image: "https://picsum.photos/seed/gorra-bordada/800/520",
-    description: "Ajustable, bordado frontal. Unitalla."
-  },
-  {
-    id: "ropa-004",
-    category: "Ropa",
-    name: "Calcetas Deportivas (Pack x3)",
-    price: 9.90,
-    image: "https://picsum.photos/seed/calcetas-pack3/800/520",
-    description: "Transpirables, soporte en arco. 3 pares."
-  },
-  {
-    id: "ropa-005",
-    category: "Ropa",
-    name: "Bolsa Tote Resistente",
-    price: 12.75,
-    image: "https://picsum.photos/seed/tote-resistente/800/520",
-    description: "Lona gruesa, ideal para mandado o escuela."
-  },
-  {
-    id: "ropa-006",
-    category: "Ropa",
-    name: "Chamarra Ligera Rompevientos",
-    price: 39.99,
-    image: "https://picsum.photos/seed/rompevientos/800/520",
-    description: "Ligera, repelente a salpicaduras. Cierre frontal."
-  },
+    // HOGAR (6)
+    { cat:"Hogar", nombre:"Vela Aromática", precio:11.50, desc:"Aroma cálido, envase de vidrio.", img:"https://images.unsplash.com/photo-1602874801007-8a3b3d5f13d8?w=700", Sabor:"Vainilla, Canela, Lavanda" },
+    { cat:"Hogar", nombre:"Difusor de Varillas", precio:15.90, desc:"Aroma constante en tu espacio.", img:"https://images.unsplash.com/photo-1602874801085-21c95b6f7b67?w=700", Sabor:"Cítrico, Floral" },
+    { cat:"Hogar", nombre:"Taza Cerámica 330ml", precio:8.20, desc:"Apta para microondas. Minimalista.", img:"https://images.unsplash.com/photo-1517705008128-361805f42e86?w=700", Color:"Blanco, Negro" },
+    { cat:"Hogar", nombre:"Botella Térmica 500ml", precio:19.90, desc:"Acero inoxidable. Frío/calor.", img:"https://images.unsplash.com/photo-1526401485004-2aa7c9f53c62?w=700", Color:"Negro, Plateado" },
+    { cat:"Hogar", nombre:"Organizador de Escritorio", precio:12.90, desc:"Ordena cables, notas y accesorios.", img:"https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=700", Material:"Madera, Metal" },
+    { cat:"Hogar", nombre:"Set Toallas (2 piezas)", precio:21.00, desc:"Suaves y absorbentes.", img:"https://images.unsplash.com/photo-1582582621959-48d27397dc5c?w=700", Color:"Blanco, Gris" },
 
-  // --- Hogar (6) ---
-  {
-    id: "hogar-001",
-    category: "Hogar",
-    name: "Vela Aromática (Vainilla)",
-    price: 11.50,
-    image: "https://picsum.photos/seed/vela-vainilla/800/520",
-    description: "Fragancia cálida, 35h aprox. Envase de vidrio."
-  },
-  {
-    id: "hogar-002",
-    category: "Hogar",
-    name: "Difusor de Varillas",
-    price: 16.90,
-    image: "https://picsum.photos/seed/difusor-varillas/800/520",
-    description: "Aroma suave constante. Incluye 6 varillas."
-  },
-  {
-    id: "hogar-003",
-    category: "Hogar",
-    name: "Taza Cerámica Minimal",
-    price: 8.20,
-    image: "https://picsum.photos/seed/taza-minimal/800/520",
-    description: "Resistente, apta microondas. 330ml."
-  },
-  {
-    id: "hogar-004",
-    category: "Hogar",
-    name: "Botella Térmica 500ml",
-    price: 19.99,
-    image: "https://picsum.photos/seed/botella-termica/800/520",
-    description: "Mantiene frío/calor. Acero inoxidable."
-  },
-  {
-    id: "hogar-005",
-    category: "Hogar",
-    name: "Organizador de Escritorio",
-    price: 13.40,
-    image: "https://picsum.photos/seed/organizador-escritorio/800/520",
-    description: "Ordena plumas, notas y cables. Compacto."
-  },
-  {
-    id: "hogar-006",
-    category: "Hogar",
-    name: "Set Toallas (2 piezas)",
-    price: 21.00,
-    image: "https://picsum.photos/seed/set-toallas/800/520",
-    description: "Suaves, absorbentes. 1 grande + 1 mediana."
-  },
+    // ACCESORIOS (6)
+    { cat:"Accesorios", nombre:"Cargador USB-C 20W", precio:14.90, desc:"Carga rápida compatible.", img:"https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=700", Modelo:"EU, US" },
+    { cat:"Accesorios", nombre:"Cable Trenzado 1.5m", precio:7.90, desc:"Resistente, ideal para uso diario.", img:"https://images.unsplash.com/photo-1583863788435-4a8f8d6b7a6b?w=700", Tipo:"USB-C, Lightning" },
+    { cat:"Accesorios", nombre:"Audífonos In-ear", precio:18.90, desc:"Buen audio para llamadas y música.", img:"https://images.unsplash.com/photo-1585386959984-a41552231693?w=700", Color:"Negro, Blanco" },
+    { cat:"Accesorios", nombre:"Soporte de Celular", precio:9.50, desc:"Para escritorio o cocina. Ajustable.", img:"https://images.unsplash.com/photo-1512499617640-c2f999fe2a5d?w=700", Tipo:"Metal, Plástico" },
+    { cat:"Accesorios", nombre:"Power Bank 10,000mAh", precio:24.90, desc:"Compacta, carga dos dispositivos.", img:"https://images.unsplash.com/photo-1602524205579-8a3f997e98c3?w=700", Modelo:"Negro, Azul" },
+    { cat:"Accesorios", nombre:"Llavero Minimal", precio:4.20, desc:"Ligero y elegante.", img:"https://images.unsplash.com/photo-1520975681324-3b8f9e8b8d50?w=700", Material:"Acero, Cuero" },
+  ];
 
-  // --- Alimentos (6) ---
-  {
-    id: "food-001",
-    category: "Alimentos",
-    name: "Café Molido Artesanal 250g",
-    price: 10.90,
-    image: "https://picsum.photos/seed/cafe-artesanal/800/520",
-    description: "Tueste medio, notas a chocolate. 250g."
-  },
-  {
-    id: "food-002",
-    category: "Alimentos",
-    name: "Granola Crujiente 400g",
-    price: 7.80,
-    image: "https://picsum.photos/seed/granola-crujiente/800/520",
-    description: "Avena, nuez y miel. Ideal con yogurt."
-  },
-  {
-    id: "food-003",
-    category: "Alimentos",
-    name: "Miel Pura 350g",
-    price: 9.60,
-    image: "https://picsum.photos/seed/miel-pura/800/520",
-    description: "Miel 100% natural. Envasada localmente."
-  },
-  {
-    id: "food-004",
-    category: "Alimentos",
-    name: "Salsa Picante (Nivel Medio)",
-    price: 5.40,
-    image: "https://picsum.photos/seed/salsa-picante/800/520",
-    description: "Equilibrada, buen sabor. 150ml."
-  },
-  {
-    id: "food-005",
-    category: "Alimentos",
-    name: "Galletas Caseras (Caja x12)",
-    price: 12.00,
-    image: "https://picsum.photos/seed/galletas-caseras/800/520",
-    description: "Surtido. Perfectas para regalo."
-  },
-  {
-    id: "food-006",
-    category: "Alimentos",
-    name: "Chocolate Amargo 70% (Barra)",
-    price: 4.90,
-    image: "https://picsum.photos/seed/chocolate-70/800/520",
-    description: "Sabor intenso. 80g."
-  },
-];
+  /** STATE (carrito con cantidades) */
+  const LS_KEY = "wa_demo_store_v2";
+  let carrito = []; // [{n,p,o,qty}]
+  let seleccionActual = {};
+  let categoriaActual = "Ropa";
+  let busqueda = "";
 
-/** =========================
- *  Estado + Persistencia
- *  ========================= */
-const LS_KEY = "demo_whatsapp_shop_v1";
-const state = loadState() || {
-  cart: {}, // { productId: qty }
-  customer: { name:"", phone:"", address:"", notes:"" },
-  ui: { search:"", category:"__all__" }
-};
+  /** INIT */
+  loadAll();
+  buildHoras();
+  filterCat(categoriaActual);
 
-function loadState(){
-  try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch { return null; }
-}
-function saveState(){
-  localStorage.setItem(LS_KEY, JSON.stringify(state));
-}
-
-/** =========================
- *  Helpers
- *  ========================= */
-const money = (n) =>
-  new Intl.NumberFormat("es-ES", { style:"currency", currency: CURRENCY, maximumFractionDigits: 2 }).format(n);
-
-function getProductById(id){ return PRODUCTS.find(p => p.id === id); }
-
-function cartItems(){
-  return Object.entries(state.cart)
-    .map(([id, qty]) => ({ product: getProductById(id), qty: Number(qty) }))
-    .filter(x => x.product && x.qty > 0);
-}
-
-function cartCount(){
-  return cartItems().reduce((sum, x) => sum + x.qty, 0);
-}
-
-function subtotal(){
-  return cartItems().reduce((sum, x) => sum + x.qty * x.product.price, 0);
-}
-
-/** =========================
- *  UI Elements
- *  ========================= */
-const elProducts = document.getElementById("products");
-const elCategory = document.getElementById("category");
-const elSearch = document.getElementById("search");
-const elCart = document.getElementById("cart");
-const elCartEmpty = document.getElementById("cartEmpty");
-const elCartCount = document.getElementById("cartCount");
-const elCartTotal = document.getElementById("cartTotal");
-const elSubtotal = document.getElementById("subtotal");
-const elShipping = document.getElementById("shipping");
-const elTotal = document.getElementById("total");
-const elWhatsBtn = document.getElementById("whatsBtn");
-const elClearCartBtn = document.getElementById("clearCartBtn");
-
-const elCustName = document.getElementById("custName");
-const elCustPhone = document.getElementById("custPhone");
-const elCustAddress = document.getElementById("custAddress");
-const elCustNotes = document.getElementById("custNotes");
-
-document.getElementById("sellerPhoneLabel").textContent = SELLER_DISPLAY;
-
-/** =========================
- *  Render: Category options
- *  ========================= */
-function renderCategories(){
-  const cats = Array.from(new Set(PRODUCTS.map(p => p.category))).sort((a,b)=>a.localeCompare(b,"es"));
-  // keep first option
-  const keep = elCategory.querySelector('option[value="__all__"]');
-  elCategory.innerHTML = "";
-  elCategory.appendChild(keep);
-  cats.forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c; opt.textContent = c;
-    elCategory.appendChild(opt);
-  });
-
-  elCategory.value = state.ui.category || "__all__";
-}
-
-/** =========================
- *  Render: Products list
- *  ========================= */
-function filteredProducts(){
-  const q = (state.ui.search || "").trim().toLowerCase();
-  const cat = state.ui.category || "__all__";
-  return PRODUCTS.filter(p => {
-    const okCat = (cat === "__all__") || (p.category === cat);
-    const hay = (p.name + " " + p.description + " " + p.category).toLowerCase();
-    const okQ = !q || hay.includes(q);
-    return okCat && okQ;
-  });
-}
-
-function renderProducts(){
-  const list = filteredProducts();
-
-  elProducts.innerHTML = "";
-  list.forEach(p => {
-    const inCart = state.cart[p.id] || 0;
-
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const img = document.createElement("img");
-    img.src = p.image;
-    img.alt = p.name;
-
-    const meta = document.createElement("div");
-    meta.className = "meta";
-
-    const row1 = document.createElement("div");
-    row1.className = "row";
-    const h = document.createElement("p");
-    h.className = "name";
-    h.textContent = p.name;
-
-    const badge = document.createElement("span");
-    badge.className = "badge";
-    badge.textContent = p.category;
-
-    row1.appendChild(h);
-    row1.appendChild(badge);
-
-    const d = document.createElement("p");
-    d.className = "desc";
-    d.textContent = p.description;
-
-    const row2 = document.createElement("div");
-    row2.className = "row";
-    const price = document.createElement("div");
-    price.className = "price";
-    price.textContent = money(p.price);
-
-    const btnrow = document.createElement("div");
-    btnrow.className = "btnrow";
-
-    const add = document.createElement("button");
-    add.className = "primary";
-    add.type = "button";
-    add.textContent = inCart ? `Agregar (+1) · En carrito: ${inCart}` : "Agregar al carrito";
-    add.onclick = () => addToCart(p.id, 1);
-
-    const less = document.createElement("button");
-    less.type = "button";
-    less.textContent = "Quitar (-1)";
-    less.disabled = !inCart;
-    less.onclick = () => addToCart(p.id, -1);
-
-    btnrow.appendChild(add);
-    btnrow.appendChild(less);
-
-    row2.appendChild(price);
-
-    meta.appendChild(row1);
-    meta.appendChild(d);
-    meta.appendChild(row2);
-    meta.appendChild(btnrow);
-
-    card.appendChild(img);
-    card.appendChild(meta);
-
-    elProducts.appendChild(card);
-  });
-
-  if(list.length === 0){
-    const empty = document.createElement("div");
-    empty.className = "warnbox";
-    empty.textContent = "No hay productos con ese filtro/búsqueda.";
-    elProducts.appendChild(empty);
+  function loadAll(){
+    try{
+      const saved = JSON.parse(localStorage.getItem(LS_KEY));
+      if(saved?.carrito) carrito = saved.carrito;
+      if(saved?.form) restoreForm(saved.form);
+      if(saved?.ui){
+        categoriaActual = saved.ui.categoria || categoriaActual;
+        busqueda = saved.ui.busqueda || "";
+        document.getElementById("search").value = busqueda;
+      }
+    }catch(e){}
+    updateCart();
   }
-}
-
-/** =========================
- *  Cart operations + render
- *  ========================= */
-function addToCart(productId, delta){
-  const current = Number(state.cart[productId] || 0);
-  const next = Math.max(0, current + delta);
-  if(next === 0) delete state.cart[productId];
-  else state.cart[productId] = next;
-
-  saveState();
-  renderAll();
-}
-
-function setQty(productId, qty){
-  const q = Math.max(0, Number(qty || 0));
-  if(q === 0) delete state.cart[productId];
-  else state.cart[productId] = q;
-
-  saveState();
-  renderAll();
-}
-
-function clearCart(){
-  state.cart = {};
-  saveState();
-  renderAll();
-}
-
-function renderCart(){
-  const items = cartItems();
-  const count = cartCount();
-  const sub = subtotal();
-  const ship = SHIPPING_FLAT;
-  const tot = sub + ship;
-
-  elCartCount.textContent = String(count);
-  elCartTotal.textContent = money(tot);
-
-  elSubtotal.textContent = money(sub);
-  elShipping.textContent = money(ship);
-  elTotal.textContent = money(tot);
-
-  if(items.length === 0){
-    elCart.style.display = "none";
-    elCartEmpty.style.display = "block";
-  } else {
-    elCart.style.display = "flex";
-    elCartEmpty.style.display = "none";
+  function saveAll(){
+    const payload = {
+      carrito,
+      form: readForm(),
+      ui: { categoria: categoriaActual, busqueda }
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(payload));
   }
 
-  elCart.innerHTML = "";
-  items.forEach(({product, qty}) => {
-    const row = document.createElement("div");
-    row.className = "cartitem";
-
-    const img = document.createElement("img");
-    img.className = "thumb";
-    img.src = product.image;
-    img.alt = product.name;
-
-    const meta = document.createElement("div");
-    meta.className = "cartmeta";
-
-    const title = document.createElement("p");
-    title.className = "title";
-    title.textContent = product.name;
-
-    const subline = document.createElement("div");
-    subline.className = "sub";
-    subline.textContent = `${product.category} · ${money(product.price)} c/u`;
-
-    const qtyrow = document.createElement("div");
-    qtyrow.className = "qtyrow";
-
-    const minus = document.createElement("button");
-    minus.className = "qtybtn";
-    minus.type = "button";
-    minus.textContent = "−";
-    minus.onclick = () => addToCart(product.id, -1);
-
-    const q = document.createElement("div");
-    q.className = "qty";
-    q.textContent = String(qty);
-
-    const plus = document.createElement("button");
-    plus.className = "qtybtn";
-    plus.type = "button";
-    plus.textContent = "+";
-    plus.onclick = () => addToCart(product.id, 1);
-
-    const del = document.createElement("button");
-    del.className = "qtybtn danger";
-    del.type = "button";
-    del.textContent = "Eliminar";
-    del.onclick = () => setQty(product.id, 0);
-
-    const lineTotal = document.createElement("div");
-    lineTotal.className = "sub";
-    lineTotal.style.marginLeft = "auto";
-    lineTotal.style.fontVariantNumeric = "tabular-nums";
-    lineTotal.textContent = money(product.price * qty);
-
-    qtyrow.appendChild(minus);
-    qtyrow.appendChild(q);
-    qtyrow.appendChild(plus);
-    qtyrow.appendChild(del);
-    qtyrow.appendChild(lineTotal);
-
-    meta.appendChild(title);
-    meta.appendChild(subline);
-    meta.appendChild(qtyrow);
-
-    row.appendChild(img);
-    row.appendChild(meta);
-
-    elCart.appendChild(row);
-  });
-
-  updateWhatsBtnState();
-}
-
-/** =========================
- *  Customer form
- *  ========================= */
-function hydrateCustomer(){
-  elCustName.value = state.customer.name || "";
-  elCustPhone.value = state.customer.phone || "";
-  elCustAddress.value = state.customer.address || "";
-  elCustNotes.value = state.customer.notes || "";
-}
-
-function saveCustomerFromInputs(){
-  state.customer.name = elCustName.value.trim();
-  state.customer.phone = elCustPhone.value.trim();
-  state.customer.address = elCustAddress.value.trim();
-  state.customer.notes = elCustNotes.value.trim();
-  saveState();
-  updateWhatsBtnState();
-}
-
-["input","change"].forEach(evt=>{
-  elCustName.addEventListener(evt, saveCustomerFromInputs);
-  elCustPhone.addEventListener(evt, saveCustomerFromInputs);
-  elCustAddress.addEventListener(evt, saveCustomerFromInputs);
-  elCustNotes.addEventListener(evt, saveCustomerFromInputs);
-});
-
-function updateWhatsBtnState(){
-  const items = cartItems();
-  const hasItems = items.length > 0;
-  const nameOk = (state.customer.name || "").length >= 2;
-  const addrOk = (state.customer.address || "").length >= 6;
-  const phoneOk = (state.customer.phone || "").length >= 6; // flexible
-  elWhatsBtn.disabled = !(hasItems && nameOk && addrOk && phoneOk);
-}
-
-/** =========================
- *  WhatsApp message builder
- *  ========================= */
-function buildWhatsMessage(){
-  const items = cartItems();
-  const sub = subtotal();
-  const ship = SHIPPING_FLAT;
-  const tot = sub + ship;
-
-  const lines = [];
-  lines.push("🛒 *NUEVO PEDIDO*");
-  lines.push("");
-  lines.push(`👤 *Nombre:* ${state.customer.name}`);
-  lines.push(`📞 *Teléfono:* ${state.customer.phone}`);
-  lines.push(`📍 *Dirección:* ${state.customer.address}`);
-  if(state.customer.notes){
-    lines.push(`📝 *Notas:* ${state.customer.notes}`);
+  /** UI: categorías + búsqueda */
+  function setActiveCatBtn(cat){
+    document.querySelectorAll('.cat-btn').forEach(b => {
+      b.classList.remove('bg-black','text-white');
+      b.classList.add('bg-gray-100','text-black');
+      if(b.innerText === cat){
+        b.classList.add('bg-black','text-white');
+        b.classList.remove('bg-gray-100');
+      }
+    });
   }
-  lines.push("");
-  lines.push("*Productos:*");
 
-  items.forEach(({product, qty}) => {
-    const line = `- ${product.name} x${qty} — ${money(product.price * qty)}`;
-    lines.push(line);
-  });
+  function applySearch(){
+    busqueda = (document.getElementById("search").value || "").trim().toLowerCase();
+    saveAll();
+    renderGrid();
+  }
+  function clearSearch(){
+    document.getElementById("search").value = "";
+    busqueda = "";
+    saveAll();
+    renderGrid();
+  }
 
-  lines.push("");
-  lines.push(`Subtotal: ${money(sub)}`);
-  lines.push(`Envío: ${money(ship)}`);
-  lines.push(`*Total: ${money(tot)}*`);
-  lines.push("");
-  lines.push("✅ Confirmo este pedido. ¿Me compartes el enlace de pago?");
-  return lines.join("\n");
-}
+  function filterCat(cat){
+    categoriaActual = cat;
+    setActiveCatBtn(cat);
+    saveAll();
+    renderGrid();
+  }
 
-function openWhatsApp(){
-  const msg = buildWhatsMessage();
-  const url = `https://wa.me/${SELLER_PHONE_E164}?text=${encodeURIComponent(msg)}`;
-  window.open(url, "_blank", "noopener,noreferrer");
-}
+  function renderGrid(){
+    const grid = document.getElementById('product-grid');
+    const list = PRODUCTOS
+      .filter(p => p.cat === categoriaActual)
+      .filter(p => {
+        if(!busqueda) return true;
+        const hay = (p.nombre + " " + p.desc + " " + p.cat + " " + JSON.stringify(p)).toLowerCase();
+        return hay.includes(busqueda);
+      });
 
-/** =========================
- *  Wire up UI events
- *  ========================= */
-elSearch.addEventListener("input", () => {
-  state.ui.search = elSearch.value;
-  saveState();
-  renderProducts();
-});
+    grid.innerHTML = list.map(p => `
+      <div onclick="openModal('${escapeHtmlAttr(p.nombre)}')" class="bg-white rounded-[2rem] p-3 border border-gray-100 flex flex-col shadow-sm cursor-pointer active:scale-95 transition-all">
+        <img src="${p.img}" class="w-full aspect-square object-cover rounded-[1.5rem] mb-2" onerror="this.src='https://picsum.photos/seed/${encodeURIComponent(p.nombre)}/600/600'">
+        <h3 class="text-xs font-black uppercase tracking-tighter">${escapeHtml(p.nombre)}</h3>
+        <p class="font-bold text-sm mt-1 text-black">${p.precio.toFixed(2)}${MONEDA}</p>
+      </div>
+    `).join('') || `<div class="col-span-2 text-sm font-bold text-gray-500 bg-white border rounded-2xl p-4">No hay resultados con ese filtro.</div>`;
+  }
 
-elCategory.addEventListener("change", () => {
-  state.ui.category = elCategory.value;
-  saveState();
-  renderProducts();
-});
+  /** Product modal + variantes */
+  function openModal(nombre) {
+    const p = PRODUCTOS.find(prod => prod.nombre === nombre);
+    if(!p) return;
+    seleccionActual = {};
 
-elWhatsBtn.addEventListener("click", openWhatsApp);
-elClearCartBtn.addEventListener("click", clearCart);
+    document.getElementById('modal-p-nombre').innerText = p.nombre;
+    document.getElementById('modal-p-img').src = p.img;
+    document.getElementById('modal-p-desc').innerText = p.desc;
+    document.getElementById('modal-p-precio').innerText = p.precio.toFixed(2) + MONEDA;
 
-/** =========================
- *  Initial render
- *  ========================= */
-function renderAll(){
-  // Restore filters
-  elSearch.value = state.ui.search || "";
-  elCategory.value = state.ui.category || "__all__";
+    const cont = document.getElementById('variantes-container');
+    cont.innerHTML = "";
 
-  renderProducts();
-  renderCart();
-}
+    const keys = ['Talla', 'Color', 'Material', 'Sabor', 'Modelo', 'Tipo'];
+    keys.forEach(key => {
+      if(p[key]) {
+        const opciones = String(p[key]).split(',').map(o => o.trim()).filter(Boolean);
+        cont.innerHTML += `
+          <div>
+            <label class="text-[10px] font-bold text-gray-400 block mb-2 uppercase">${escapeHtml(key)}</label>
+            <div class="flex gap-2 flex-wrap" id="g-${key}">
+              ${opciones.map(o => `
+                <button type="button" onclick="sel(this, '${key}', '${escapeHtmlAttr(o)}')" class="border-2 px-4 py-2 rounded-xl text-xs font-bold">
+                  ${escapeHtml(o)}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+    });
 
-renderCategories();
-hydrateCustomer();
-renderAll();
+    document.getElementById('add-from-modal').onclick = () => {
+      addToCart(p.nombre, p.precio, {...seleccionActual});
+      closeProductModal();
+    };
+
+    document.getElementById('product-modal').classList.remove('hidden');
+  }
+
+  function sel(btn, k, v) {
+    document.querySelectorAll(`#g-${k} button`).forEach(b => b.classList.remove('bg-black', 'text-white', 'border-black'));
+    btn.classList.add('bg-black', 'text-white', 'border-black');
+    seleccionActual[k] = v;
+  }
+
+  function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
+  function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); }
+
+  /** Carrito con cantidades (mismo producto + mismas opciones = suma qty) */
+  function keyOf(n, o){
+    const opts = Object.entries(o||{}).sort(([a],[b]) => a.localeCompare(b));
+    return n + "||" + JSON.stringify(opts);
+  }
+
+  function addToCart(n, p, o) {
+    const k = keyOf(n,o);
+    const found = carrito.find(x => x.k === k);
+    if(found) found.qty += 1;
+    else carrito.push({ k, n, p, o, qty: 1 });
+    saveAll();
+    updateCart(true);
+  }
+
+  function incItem(k){
+    const it = carrito.find(x => x.k === k);
+    if(!it) return;
+    it.qty += 1;
+    saveAll();
+    updateCart(true);
+  }
+
+  function decItem(k){
+    const it = carrito.find(x => x.k === k);
+    if(!it) return;
+    it.qty -= 1;
+    if(it.qty <= 0) carrito = carrito.filter(x => x.k !== k);
+    saveAll();
+    updateCart(true);
+  }
+
+  function removeItem(k){
+    carrito = carrito.filter(x => x.k !== k);
+    saveAll();
+    updateCart(true);
+  }
+
+  function vaciarCarrito(){
+    if(!confirm("¿Vaciar carrito?")) return;
+    carrito = [];
+    saveAll();
+    updateCart(true);
+  }
+
+  function updateCart(keepOpen=false) {
+    const count = carrito.reduce((s,x)=>s+x.qty,0);
+    document.getElementById('cart-count').innerText = count;
+
+    let subtotal = 0;
+    const html = carrito.map(it => {
+      subtotal += it.p * it.qty;
+      const variantes = Object.values(it.o||{}).join(' / ');
+      return `
+        <div class="bg-gray-50 p-3 rounded-2xl text-xs font-bold">
+          <div class="flex justify-between gap-3">
+            <div>
+              <span>${escapeHtml(it.n)}</span><br>
+              <small class="text-gray-400">${escapeHtml(variantes || 'Sin variantes')}</small>
+            </div>
+            <div class="text-right whitespace-nowrap">
+              <div>${(it.p*it.qty).toFixed(2)}${MONEDA}</div>
+              <div class="text-[10px] text-gray-400 font-black">${it.p.toFixed(2)}${MONEDA} c/u</div>
+            </div>
+          </div>
+
+          <div class="mt-3 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="decItem('${escapeHtmlAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black">−</button>
+              <span class="px-3 py-2 rounded-xl border bg-white font-black">${it.qty}</span>
+              <button type="button" onclick="incItem('${escapeHtmlAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black">+</button>
+            </div>
+            <button type="button" onclick="removeItem('${escapeHtmlAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black text-red-600">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('cart-items').innerHTML = html || `
+      <div class="bg-gray-50 p-4 rounded-2xl text-sm font-bold text-gray-500">
+        Tu carrito está vacío. Agrega productos para poder enviar el pedido.
+      </div>
+    `;
+
+    document.getElementById('total-val').innerText = subtotal.toFixed(2) + MONEDA;
+
+    if(keepOpen && document.getElementById('cart-modal').classList.contains('hidden') === false){
+      // already open
+    }
+  }
+
+  /** Form persistence */
+  function readForm(){
+    return {
+      modo: document.getElementById('entrega-modo').value,
+      tipo: document.getElementById('entrega-tipo').value,
+      hora: document.getElementById('entrega-hora').value,
+      pago: document.getElementById('pago-metodo').value,
+      notes: document.getElementById('cust-notes').value,
+      name: document.getElementById('cust-name').value,
+      phone: document.getElementById('cust-phone').value,
+      address: document.getElementById('cust-address').value
+    };
+  }
+  function restoreForm(f){
+    if(!f) return;
+    if(f.modo) document.getElementById('entrega-modo').value = f.modo;
+    if(f.tipo) document.getElementById('entrega-tipo').value = f.tipo;
+    if(f.hora) document.getElementById('entrega-hora').value = f.hora;
+    if(f.pago) document.getElementById('pago-metodo').value = f.pago;
+    if(f.notes) document.getElementById('cust-notes').value = f.notes;
+    if(f.name) document.getElementById('cust-name').value = f.name;
+    if(f.phone) document.getElementById('cust-phone').value = f.phone;
+    if(f.address) document.getElementById('cust-address').value = f.address;
+
+    document.getElementById('entrega-hora').classList.toggle('hidden', document.getElementById('entrega-tipo').value !== 'Programar');
+    onEntregaModoChange(false);
+  }
+  function saveForm(){ saveAll(); }
+
+  function onEntregaModoChange(save=true){
+    const modo = document.getElementById('entrega-modo').value;
+    const wrap = document.getElementById('address-wrap');
+    wrap.classList.toggle('opacity-60', modo === "Recoger");
+    if(save) saveForm();
+  }
+
+  /** WhatsApp */
+  function enviarPedido() {
+    const form = readForm();
+    const modo = form.modo;
+    const tipo = form.tipo;
+    const hora = (tipo === 'Programar') ? (form.hora || 'Hora no seleccionada') : 'Lo antes posible';
+    const pago = form.pago;
+
+    const nombre = (form.name || "").trim();
+    const tlf = (form.phone || "").trim();
+    const addr = (form.address || "").trim();
+    const notas = (form.notes || "").trim();
+
+    if(carrito.length === 0) return alert("Tu carrito está vacío.");
+    if(!nombre || nombre.length < 2) return alert("Escribe tu nombre.");
+    if(!tlf || tlf.length < 6) return alert("Escribe tu teléfono.");
+
+    // Dirección solo obligatoria si es domicilio
+    if(modo === "Domicilio" && (!addr || addr.length < 6)) {
+      return alert("Escribe tu dirección completa (o elige 'Para Recoger').");
+    }
+
+    let lista = "";
+    let sub = 0;
+    carrito.forEach(it => {
+      const variantes = Object.values(it.o||{}).join(' / ') || "Sin variantes";
+      sub += it.p * it.qty;
+      lista += `• ${it.n} x${it.qty} [${variantes}] (${(it.p*it.qty).toFixed(2)}${MONEDA})\n`;
+    });
+
+    const msjPlano =
+`📦 NUEVO PEDIDO
+👤 CLIENTE: ${nombre}
+📞 TELÉFONO: ${tlf}
+📍 LUGAR: ${modo === "Domicilio" ? addr : "Para recoger (sin dirección)"}
+🚚 TIPO: ${modo}
+⏰ HORA: ${hora}
+💳 PAGO: ${pago}
+------------------
+🛍️ PEDIDO:
+${lista}
+📝 NOTAS: ${notas || "Ninguna"}
+💰 TOTAL: ${sub.toFixed(2)}${MONEDA}
+------------------
+🔄 Confirma recepción y envía enlace de pago.`;
+
+    const url = `https://wa.me/${WHATSAPP_VENDEDOR}?text=${encodeURIComponent(msjPlano)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  /** Hours dropdown */
+  function buildHoras(){
+    const el = document.getElementById('entrega-hora');
+    let out = "";
+    for(let h=9; h<=21; h++){
+      for(let m=0; m<60; m+=15){
+        const mm = m===0 ? "00" : String(m);
+        out += `<option value="${h}:${mm}">A las ${h}:${mm}</option>`;
+      }
+    }
+    el.innerHTML = out;
+  }
+
+  /** Small escaping helpers */
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function escapeHtmlAttr(s){
+    return escapeHtml(s).replace(/`/g,'&#96;');
+  }
 </script>
 </body>
 </html>
