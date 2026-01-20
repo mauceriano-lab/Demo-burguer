@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burger Master | Carta Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --bg-tienda: #fefeff; --btn: #000000; --txt: #000000; --prc: #000000; }
+        body { background-color: var(--bg-tienda); color: var(--txt); font-family: 'Segoe UI', Roboto, sans-serif; }
+        .btn-principal { background-color: var(--btn) !important; color: white; }
+        .text-precios { color: var(--prc) !important; }
+        .modal-animate { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="pb-20">
+
+    <header class="bg-white sticky top-0 z-40 border-b">
+        <div class="max-w-md mx-auto px-5 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-black italic tracking-tighter uppercase">BURGER MASTER 🍔</h1>
+            <button onclick="toggleCart()" class="relative p-2 bg-gray-100 rounded-full">
+                <i class="fa-solid fa-shopping-bag text-xl"></i>
+                <span id="cart-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+            </button>
+        </div>
+        <div class="max-w-md mx-auto px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-t">
+            <button onclick="filterCat('Hamburguesas')" class="cat-btn bg-black text-white px-5 py-2 rounded-full text-xs font-bold">Hamburguesas</button>
+            <button onclick="filterCat('Entrantes')" class="cat-btn bg-gray-100 px-5 py-2 rounded-full text-xs font-bold">Entrantes</button>
+            <button onclick="filterCat('Bebidas')" class="cat-btn bg-gray-100 px-5 py-2 rounded-full text-xs font-bold">Bebidas</button>
+            <button onclick="filterCat('Postres')" class="cat-btn bg-gray-100 px-5 py-2 rounded-full text-xs font-bold">Postres</button>
+        </div>
+    </header>
+
+    <main id="product-grid" class="max-w-md mx-auto px-5 py-6 grid grid-cols-2 gap-4"></main>
+
+    <div id="product-modal" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-end sm:items-center justify-center backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] p-6 max-h-[90vh] overflow-y-auto modal-animate">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-p-nombre" class="text-xl font-black uppercase tracking-tighter"></h3>
+                <button onclick="closeProductModal()" class="text-3xl text-gray-300">&times;</button>
+            </div>
+            <img id="modal-p-img" src="" class="w-full aspect-square object-cover rounded-[2rem] mb-4">
+            <p id="modal-p-desc" class="text-gray-500 text-sm mb-6"></p>
+            <div id="variantes-container" class="space-y-6 mb-8"></div>
+            <div class="flex items-center justify-between gap-4 sticky bottom-0 bg-white pt-3 border-t">
+                <span id="modal-p-precio" class="text-2xl font-black"></span>
+                <button id="add-from-modal" class="flex-grow btn-principal py-4 rounded-2xl font-bold uppercase text-xs tracking-widest shadow-lg">Añadir Ahora</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-modal" class="fixed inset-0 bg-black/50 z-[70] hidden backdrop-blur-sm">
+        <div class="bg-white w-full max-w-sm h-full ml-auto flex flex-col p-6 shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-4 mb-4">
+                <h2 class="text-xl font-black uppercase">Tu Carrito</h2>
+                <button onclick="toggleCart()" class="text-3xl text-gray-300">&times;</button>
+            </div>
+            <div id="cart-items" class="flex-grow overflow-y-auto space-y-3"></div>
+            <div class="border-t pt-4 mt-4 space-y-4 overflow-y-auto">
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400">¿Para cuándo lo quieres?</label>
+                    <select id="entrega-tipo" onchange="document.getElementById('entrega-hora').classList.toggle('hidden', this.value !== 'Programar')" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm">
+                        <option value="Lo antes posible">Lo antes posible ⚡</option>
+                        <option value="Programar">Elegir hora ⏰</option>
+                    </select>
+                    <select id="entrega-hora" class="hidden w-full p-3 mt-2 bg-gray-50 border rounded-xl font-bold text-sm text-blue-600"></select>
+                </div>
+                <textarea id="cust-notes" placeholder="¿Alguna alergia? ¿Quitar algún ingrediente?" class="w-full p-3 bg-gray-50 border rounded-xl text-sm h-16"></textarea>
+                <input type="text" id="cust-name" placeholder="Tu Nombre" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
+                <input type="text" id="cust-address" placeholder="Dirección / Nº de Mesa" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
+                <div class="flex justify-between text-2xl font-black border-t pt-2">
+                    <span>TOTAL:</span>
+                    <span id="total-val">0.00€</span>
+                </div>
+                <button onclick="enviarPedido()" class="w-full btn-principal py-5 rounded-2xl font-black text-sm uppercase flex items-center justify-center gap-3">
+                    <i class="fa-brands fa-whatsapp text-2xl"></i> HACER PEDIDO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WHATSAPP_RESTAURANTE = "34614154983"; 
+        const PRODUCTOS = [
+            { cat: "Hamburguesas", nombre: "La Quesosa", precio: 12.50, desc: "Doble queso cheddar, carne 100% buey y nuestra salsa secreta.", img: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=500", Color: "Poco hecho, Al punto, Muy hecha", Talla: "Normal, Doble (+3€)" },
+            { cat: "Hamburguesas", nombre: "Bacon BBQ", precio: 13.90, desc: "Bacon ahumado crujiente, aros de cebolla y BBQ.", img: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=500", Color: "Al punto, Muy hecha" },
+            { cat: "Entrantes", nombre: "Patatas Bravas", precio: 5.50, desc: "Patatas naturales cortadas a mano con salsa picante.", img: "https://images.unsplash.com/photo-1573015084185-7205ba3d6f2e?w=500", Sabor: "Picante, Suave, Sin Salsa" },
+            { cat: "Entrantes", nombre: "Nachos Completos", precio: 8.90, desc: "Guacamole, queso fundido y jalapeños.", img: "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=500", Tipo: "Con Jalapeños, Sin Jalapeños" },
+            { cat: "Bebidas", nombre: "Refresco 33cl", precio: 2.50, desc: "Frío de nevera.", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500", Modelo: "Coca-Cola, Fanta, Sprite, Agua" },
+            { cat: "Postres", nombre: "Brownie Casero", precio: 4.50, desc: "Con una bola de helado de vainilla.", img: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500" }
+        ];
+
+        let carrito = [];
+        let seleccionActual = {};
+
+        function filterCat(cat) {
+            document.querySelectorAll('.cat-btn').forEach(b => {
+                b.classList.replace('bg-black', 'bg-gray-100');
+                b.classList.replace('text-white', 'text-black');
+                if(b.innerText === cat) { b.classList.replace('bg-gray-100', 'bg-black'); b.classList.replace('text-black', 'text-white'); }
+            });
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = PRODUCTOS.filter(p => p.cat === cat).map(p => `
+                <div onclick="openModal('${p.nombre}')" class="bg-white rounded-[2rem] p-3 border border-gray-100 flex flex-col shadow-sm cursor-pointer">
+                    <img src="${p.img}" class="w-full aspect-square object-cover rounded-[1.5rem] mb-2">
+                    <h3 class="text-xs font-black uppercase tracking-tighter">${p.nombre}</h3>
+                    <p class="font-bold text-sm mt-1">${p.precio.toFixed(2)}€</p>
+                </div>
+            `).join('');
+        }
+
+        function openModal(nombre) {
+            const p = PRODUCTOS.find(prod => prod.nombre === nombre);
+            seleccionActual = {};
+            document.getElementById('modal-p-nombre').innerText = p.nombre;
+            document.getElementById('modal-p-img').src = p.img;
+            document.getElementById('modal-p-desc').innerText = p.desc;
+            document.getElementById('modal-p-precio').innerText = p.precio.toFixed(2) + "€";
+            
+            const cont = document.getElementById('variantes-container');
+            cont.innerHTML = "";
+            ['Talla', 'Color', 'Material', 'Sabor', 'Modelo', 'Tipo'].forEach(key => {
+                if(p[key]) {
+                    const opciones = p[key].split(',').map(o => o.trim());
+                    cont.innerHTML += `<label class="text-[10px] font-bold text-gray-400 block mb-2 uppercase">${key === 'Color' ? 'Punto de Carne' : key}</label>
+                        <div class="flex gap-2 flex-wrap" id="g-${key}">${opciones.map(o => `<button onclick="sel(this, '${key}', '${o}')" class="border-2 px-4 py-2 rounded-xl text-xs font-bold">${o}</button>`).join('')}</div>`;
+                }
+            });
+
+            document.getElementById('add-from-modal').onclick = () => {
+                addToCart(p.nombre, p.precio, {...seleccionActual});
+                closeProductModal();
+            };
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function sel(btn, k, v) {
+            document.querySelectorAll(`#g-${k} button`).forEach(b => b.classList.remove('bg-black', 'text-white', 'border-black'));
+            btn.classList.add('bg-black', 'text-white', 'border-black');
+            seleccionActual[k] = v;
+        }
+
+        function addToCart(n, p, o) {
+            carrito.push({ n, p, o });
+            updateCart();
+        }
+
+        function updateCart() {
+            document.getElementById('cart-count').innerText = carrito.length;
+            let subtotal = 0;
+            document.getElementById('cart-items').innerHTML = carrito.map(p => {
+                subtotal += p.p;
+                return `<div class="bg-gray-50 p-3 rounded-2xl text-xs font-bold flex justify-between">
+                    <span>${p.n} <br><small class="text-gray-400">${Object.values(p.o).join(' / ')}</small></span>
+                    <span>${p.p.toFixed(2)}€</span>
+                </div>`;
+            }).join('');
+            document.getElementById('total-val').innerText = subtotal.toFixed(2) + "€";
+        }
+
+        function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
+        function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); }
+
+        function enviarPedido() {
+            const nombre = document.getElementById('cust-name').value;
+            const addr = document.getElementById('cust-address').value;
+            if(!nombre || !addr || carrito.length === 0) return alert("Completa los datos");
+
+            let lista = ""; let sub = 0;
+            carrito.forEach(p => {
+                lista += `• ${p.n} [${Object.values(p.o).join(' / ')}] (${p.p.toFixed(2)}€)%0A`;
+                sub += p.p;
+            });
+            const tiempo = document.getElementById('entrega-tipo').value === 'Programar' ? document.getElementById('entrega-hora').value : "Lo antes posible";
+            const msj = `*📦 NUEVO PEDIDO BURGER*%0A👤 *CLIENTE:* ${nombre}%0A📍 *LUGAR:* ${addr}%0A⏰ *HORA:* ${tiempo}%0A------------------%0A🛍️ *PRODUCTOS:*%0A${lista}%0A📝 *NOTAS:* ${document.getElementById('cust-notes').value || 'Ninguna'}%0A💰 *TOTAL: ${sub.toFixed(2)}€*%0A------------------%0A🔄 _A la espera de confirmación._`;
+            window.open(`https://wa.me/${WHATSAPP_RESTAURANTE}?text=${msj}`, '_blank');
+        }
+
+        // Generar horas 19:00 a 23:45
+        for(let h=19; h<=23; h++) for(let m=0; m<60; m+=15) document.getElementById('entrega-hora').innerHTML += `<option value="${h}:${m==0?'00':m}">A las ${h}:${m==0?'00':m}</option>`;
+        
+        filterCat('Hamburguesas');
+    </script>
+</body>
+</html>
