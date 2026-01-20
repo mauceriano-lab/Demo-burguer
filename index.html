@@ -1,392 +1,882 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger Master | Demo Profesional</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root { --btn: #000000; --txt: #000000; --bg: #f9fafb; }
-        body { background-color: var(--bg); color: var(--txt); font-family: system-ui, -apple-system, sans-serif; }
-        .btn-principal { background-color: var(--btn) !important; color: white; }
-        .modal-animate { animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Demo Tienda por WhatsApp</title>
+  <style>
+    :root{
+      --bg:#070b14;
+      --panel:#0f1b33;
+      --panel2:#0c162b;
+      --text:#e6edf7;
+      --muted:#9fb0c6;
+      --border:rgba(159,176,198,.18);
+      --accent:#22c55e;
+      --danger:#ef4444;
+      --warn:#f59e0b;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      background: radial-gradient(1200px 600px at 30% -20%, rgba(34,197,94,.18), transparent 60%),
+                  radial-gradient(900px 500px at 110% 20%, rgba(245,158,11,.14), transparent 55%),
+                  linear-gradient(180deg, #050813, var(--bg));
+      color:var(--text);
+    }
+    a{color:inherit}
+    header{
+      position:sticky; top:0; z-index:10;
+      background:rgba(5,8,19,.82);
+      backdrop-filter:saturate(180%) blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:14px 16px}
+    .top{
+      display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    }
+    .brand{display:flex; flex-direction:column; gap:2px}
+    .brand h1{margin:0;font-size:16px;letter-spacing:.2px}
+    .brand small{color:var(--muted)}
+    .chiprow{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .chip{
+      display:flex; gap:10px; align-items:center;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:8px 12px;
+      background:rgba(15,27,51,.65);
+      box-shadow: 0 8px 25px rgba(0,0,0,.15);
+      font-size:13px;
+    }
+    .chip b{font-variant-numeric: tabular-nums}
+    .chip .dot{width:8px;height:8px;border-radius:999px;background:var(--accent)}
+    main .grid{
+      display:grid;
+      grid-template-columns: 1.35fr .65fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){ main .grid{grid-template-columns:1fr} }
+
+    .panel{
+      background:rgba(15,27,51,.78);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      overflow:hidden;
+      box-shadow: var(--shadow);
+    }
+    .panel h2{
+      margin:0;
+      padding:12px 14px;
+      font-size:14px;
+      border-bottom:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(12,22,43,.4), rgba(12,22,43,.0));
+    }
+    .panel .content{padding:14px}
+    .controls{
+      display:grid;
+      grid-template-columns: 1fr 220px;
+      gap:10px;
+      margin-bottom:12px;
+    }
+    @media (max-width: 560px){ .controls{grid-template-columns:1fr} }
+    input, select, textarea{
+      width:100%;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:rgba(12,22,43,.55);
+      color:var(--text);
+      outline:none;
+    }
+    textarea{min-height:70px;resize:vertical}
+    input::placeholder, textarea::placeholder{color:rgba(159,176,198,.7)}
+    .products{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:12px;
+    }
+    @media (max-width: 980px){ .products{grid-template-columns: repeat(2, minmax(0,1fr))} }
+    @media (max-width: 560px){ .products{grid-template-columns:1fr} }
+
+    .card{
+      border:1px solid var(--border);
+      border-radius:14px;
+      overflow:hidden;
+      background:rgba(12,22,43,.5);
+      display:flex;
+      flex-direction:column;
+      min-height: 100%;
+    }
+    .card img{
+      width:100%;
+      height:160px;
+      object-fit:cover;
+      background:#0b1220;
+      display:block;
+    }
+    .card .meta{
+      padding:10px 10px 12px 10px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      flex:1;
+    }
+    .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .name{font-size:14px;margin:0}
+    .badge{
+      font-size:11px;
+      color:var(--muted);
+      border:1px solid var(--border);
+      padding:4px 8px;
+      border-radius:999px;
+      white-space:nowrap;
+      background:rgba(15,27,51,.45);
+    }
+    .desc{margin:0;color:var(--muted);font-size:12px;line-height:1.35}
+    .price{
+      font-variant-numeric: tabular-nums;
+      font-weight:700;
+      font-size:14px;
+    }
+    .btnrow{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:auto}
+    button{
+      cursor:pointer;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:rgba(15,27,51,.6);
+      color:var(--text);
+      padding:10px 10px;
+      font-weight:600;
+    }
+    button.primary{
+      background:rgba(34,197,94,.16);
+      border-color: rgba(34,197,94,.45);
+    }
+    button.danger{
+      background:rgba(239,68,68,.14);
+      border-color: rgba(239,68,68,.45);
+    }
+    button:disabled{opacity:.5;cursor:not-allowed}
+
+    .cartlist{display:flex;flex-direction:column;gap:10px}
+    .cartitem{
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:rgba(12,22,43,.5);
+      padding:10px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .thumb{
+      width:56px;height:56px;border-radius:12px;object-fit:cover;background:#0b1220;
+      border:1px solid rgba(255,255,255,.06);
+      flex:0 0 auto;
+    }
+    .cartmeta{flex:1;display:flex;flex-direction:column;gap:6px}
+    .cartmeta .title{margin:0;font-size:13px}
+    .cartmeta .sub{color:var(--muted);font-size:12px}
+    .qtyrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .qtybtn{padding:6px 10px;border-radius:10px}
+    .qty{
+      min-width:32px;text-align:center;font-variant-numeric: tabular-nums;
+      padding:6px 10px;border-radius:10px;border:1px solid var(--border);
+      background:rgba(15,27,51,.45);
+    }
+    .totals{
+      margin-top:12px;
+      border-top:1px solid var(--border);
+      padding-top:12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .line{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px}
+    .line strong{color:var(--text)}
+    .help{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .warnbox{
+      border:1px solid rgba(245,158,11,.35);
+      background:rgba(245,158,11,.08);
+      padding:10px;
+      border-radius:14px;
+      color:rgba(255,255,255,.9);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .footerbar{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      margin-top:10px;
+    }
+    .smallbtn{padding:8px 10px;font-size:12px;border-radius:12px}
+    .muted{color:var(--muted)}
+  </style>
 </head>
-<body class="pb-20">
 
-    <header class="bg-white sticky top-0 z-40 border-b shadow-sm">
-        <div class="max-w-md mx-auto px-5 py-4 flex justify-between items-center">
-            <div class="flex flex-col">
-                <h1 class="text-xl font-black italic tracking-tighter uppercase">BURGER MASTER 🍔</h1>
-                <span id="estado-local" class="text-[10px] font-bold uppercase text-gray-400"></span>
-            </div>
-            <button onclick="toggleCart()" class="relative p-2 bg-gray-100 rounded-full">
-                <i class="fa-solid fa-shopping-bag text-xl"></i>
-                <span id="cart-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
-            </button>
-        </div>
-        <div class="max-w-md mx-auto px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-t bg-white">
-            <button onclick="filterCat('Hamburguesas')" class="cat-btn bg-black text-white px-5 py-2 rounded-full text-xs font-bold shrink-0">Hamburguesas</button>
-            <button onclick="filterCat('Entrantes')" class="cat-btn bg-gray-100 text-black px-5 py-2 rounded-full text-xs font-bold shrink-0">Entrantes</button>
-            <button onclick="filterCat('Bebidas')" class="cat-btn bg-gray-100 text-black px-5 py-2 rounded-full text-xs font-bold shrink-0">Bebidas</button>
-            <button onclick="filterCat('Postres')" class="cat-btn bg-gray-100 text-black px-5 py-2 rounded-full text-xs font-bold shrink-0">Postres</button>
-        </div>
-    </header>
-
-    <main id="product-grid" class="max-w-md mx-auto px-5 py-6 grid grid-cols-2 gap-4"></main>
-
-    <div id="product-modal" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-end sm:items-center justify-center backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] p-6 max-h-[90vh] overflow-y-auto modal-animate">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="modal-p-nombre" class="text-xl font-black uppercase"></h3>
-                <button onclick="closeProductModal()" class="text-3xl text-gray-300">&times;</button>
-            </div>
-            <img id="modal-p-img" src="" class="w-full aspect-square object-cover rounded-[2rem] mb-4 shadow-md">
-            <p id="modal-p-desc" class="text-gray-500 text-sm mb-6"></p>
-            <div id="variantes-container" class="space-y-6 mb-8"></div>
-            <div class="flex items-center justify-between gap-4 sticky bottom-0 bg-white pt-3 border-t">
-                <span id="modal-p-precio" class="text-2xl font-black"></span>
-                <button id="add-from-modal" class="flex-grow btn-principal py-4 rounded-2xl font-bold uppercase text-xs tracking-widest">Añadir</button>
-            </div>
-        </div>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <h1>Demo — Tienda por WhatsApp (Carrito + Pedido)</h1>
+        <small>Selecciona productos, completa tus datos y envía el pedido por WhatsApp al vendedor.</small>
+      </div>
+      <div class="chiprow">
+        <div class="chip"><span class="dot"></span><span>Vendedor:</span> <b id="sellerPhoneLabel"></b></div>
+        <div class="chip"><span>Items:</span> <b id="cartCount">0</b></div>
+        <div class="chip"><span>Total:</span> <b id="cartTotal">$0</b></div>
+      </div>
     </div>
+  </div>
+</header>
 
-    <div id="cart-modal" class="fixed inset-0 bg-black/50 z-[70] hidden backdrop-blur-sm">
-        <div class="bg-white w-full max-w-sm h-full ml-auto flex flex-col p-6 shadow-2xl overflow-y-auto">
-            <div class="flex justify-between items-center border-b pb-4 mb-4">
-                <h2 class="text-xl font-black uppercase">Tu Carrito</h2>
-                <button onclick="toggleCart()" class="text-3xl text-gray-300">&times;</button>
-            </div>
-
-            <div id="cart-items" class="space-y-3 mb-6"></div>
-
-            <div class="space-y-4 border-t pt-4">
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400">Tipo de Entrega</label>
-                    <select id="entrega-modo" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm mt-1">
-                        <option value="Domicilio">A Domicilio 🏠</option>
-                        <option value="Recoger">Para Recoger 🥡</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400">¿Para cuándo?</label>
-                    <select id="entrega-tipo" onchange="document.getElementById('entrega-hora').classList.toggle('hidden', this.value !== 'Programar')" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm mt-1">
-                        <option value="Lo antes posible">Lo antes posible ⚡</option>
-                        <option value="Programar">Seleccionar hora ⏰</option>
-                    </select>
-                    <select id="entrega-hora" class="hidden w-full p-3 mt-2 bg-gray-50 border rounded-xl font-bold text-sm text-blue-600"></select>
-                </div>
-
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400">Método de Pago</label>
-                    <select id="pago-metodo" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm mt-1">
-                        <option value="Efectivo">Efectivo 💵</option>
-                        <option value="Tarjeta">Tarjeta (Datafono) 💳</option>
-                    </select>
-                </div>
-
-                <textarea id="cust-notes" placeholder="Notas (sin cebolla, alergias...)" class="w-full p-3 bg-gray-50 border rounded-xl text-sm h-16"></textarea>
-                <input type="text" id="cust-name" placeholder="Tu Nombre" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
-                <input type="tel" id="cust-phone" placeholder="Tu Teléfono" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
-
-                <!-- Dirección: ahora se oculta si es Recoger -->
-                <div id="address-wrap">
-                    <input type="text" id="cust-address" placeholder="Dirección completa" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
-                    <p class="text-[10px] font-bold uppercase text-gray-400 mt-2">
-                        Pedido mínimo: <span id="minimo-ui"></span>
-                    </p>
-                </div>
-
-                <div class="flex justify-between text-2xl font-black pt-2">
-                    <span>TOTAL:</span>
-                    <span id="total-val">0.00€</span>
-                </div>
-
-                <button id="btn-pedir" onclick="enviarPedido()" class="w-full btn-principal py-5 rounded-2xl font-black text-sm uppercase flex items-center justify-center gap-3 mb-10">
-                    <i class="fa-brands fa-whatsapp text-2xl"></i> HACER PEDIDO
-                </button>
-            </div>
+<main class="wrap">
+  <div class="grid">
+    <!-- Catálogo -->
+    <section class="panel">
+      <h2>Catálogo</h2>
+      <div class="content">
+        <div class="controls">
+          <input id="search" type="search" placeholder="Buscar por nombre o detalle (ej. 'algodón', 'café', 'fitness')…" />
+          <select id="category">
+            <option value="__all__">Todas las categorías</option>
+          </select>
         </div>
-    </div>
 
-    <script>
-        // ===================== CONFIG (mejoras mínimas) =====================
-        const WHATSAPP_RESTAURANTE = "34614154983";
+        <div id="products" class="products"></div>
 
-        // Pedido mínimo (0 para desactivar)
-        const PEDIDO_MINIMO = 15.00;
+        <div class="help">
+          Tip: esta demo usa fotos públicas aleatorias (picsum.photos). En tu versión real, cambia la propiedad <b>image</b> de cada producto por tu URL o por <code>img/tu-foto.jpg</code>.
+        </div>
+      </div>
+    </section>
 
-        // Horario simple por hora (24h). Si no quieres, pon ABRE=0 y CIERRA=24
-        const HORARIO = { ABRE: 11, CIERRA: 23 }; // abierto desde 19:00 hasta 22:59
+    <!-- Carrito + Checkout -->
+    <aside class="panel">
+      <h2>Carrito y pedido</h2>
+      <div class="content">
+        <div id="cartEmpty" class="warnbox">
+          Tu carrito está vacío. Agrega productos del catálogo para poder enviar el pedido.
+        </div>
 
-        function estaAbiertoAhora() {
-            const h = new Date().getHours();
-            // intervalo [ABRE, CIERRA)
-            return h >= HORARIO.ABRE && h < HORARIO.CIERRA;
-        }
+        <div id="cart" class="cartlist" style="display:none;"></div>
 
-        function actualizarEstadoLocal() {
-            const el = document.getElementById('estado-local');
-            const abierto = estaAbiertoAhora();
-            el.innerText = abierto
-                ? `ABIERTO · ${HORARIO.ABRE}:00–${HORARIO.CIERRA}:00`
-                : `CERRADO · ${HORARIO.ABRE}:00–${HORARIO.CIERRA}:00`;
-            const btn = document.getElementById('btn-pedir');
-            if (btn) {
-                btn.disabled = !abierto;
-                btn.classList.toggle('opacity-50', !abierto);
-                btn.classList.toggle('cursor-not-allowed', !abierto);
-            }
-        }
-        // ===================================================================
+        <div class="totals">
+          <div class="line"><span>Subtotal</span><strong id="subtotal">$0</strong></div>
+          <div class="line"><span>Envío</span><strong id="shipping">$0</strong></div>
+          <div class="line"><span>Total</span><strong id="total">$0</strong></div>
+        </div>
 
-        const PRODUCTOS = [
-            { cat: "Hamburguesas", nombre: "La Clásica", precio: 10.50, desc: "Carne 100% vacuno, queso, lechuga y tomate.", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500", Color: "Al punto, Muy hecha, Sangrante" },
-            { cat: "Hamburguesas", nombre: "Bacon Cheese", precio: 12.50, desc: "Mucho bacon crujiente y doble cheddar fundido.", img: "https://images.unsplash.com/photo-1553979459-d2229ba7143b?w=500", Color: "Al punto, Muy hecha" },
-            { cat: "Hamburguesas", nombre: "Trufa & Setas", precio: 14.90, desc: "Crema de trufa negra y mix de setas salteadas.", img: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=500", Color: "Al punto, Muy hecha" },
-            { cat: "Hamburguesas", nombre: "La Picante", precio: 11.90, desc: "Jalapeños, salsa brava y queso pepper jack.", img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500", Color: "Al punto, Muy hecha" },
-            { cat: "Hamburguesas", nombre: "Pollo Crispy", precio: 10.00, desc: "Contramuslo de pollo super crujiente y col slow.", img: "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=500" },
-            { cat: "Hamburguesas", nombre: "Vegan Burger", precio: 11.00, desc: "Carne vegetal Beyond Meat y queso vegano.", img: "https://images.unsplash.com/photo-1512152272829-e3139592d56f?w=500" },
-            { cat: "Entrantes", nombre: "Patatas Fritas", precio: 4.50, desc: "Corte grueso casero con sal marina.", img: "https://images.unsplash.com/photo-1573015084185-7205ba3d6f2e?w=500", Sabor: "Ketchup, Mayonesa, Mostaza" },
-            { cat: "Entrantes", nombre: "Nachos Supreme", precio: 9.00, desc: "Guacamole, nata agria y chili con carne.", img: "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=500" },
-            { cat: "Entrantes", nombre: "Aros de Cebolla", precio: 5.50, desc: "8 unidades con salsa BBQ.", img: "https://images.unsplash.com/photo-1639024471283-03518883512d?w=500" },
-            { cat: "Entrantes", nombre: "Nuggets Pollo", precio: 6.00, desc: "6 unidades de pollo real rebozado.", img: "https://images.unsplash.com/photo-1562967914-608f82629710?w=500" },
-            { cat: "Entrantes", nombre: "Tequeños Queso", precio: 7.50, desc: "5 palitos de queso con mermelada.", img: "https://images.unsplash.com/photo-1541529086526-db283c563270?w=500" },
-            { cat: "Entrantes", nombre: "Ensalada Col", precio: 4.00, desc: "Receta americana clásica.", img: "https://images.unsplash.com/photo-1625944525533-473f1a3d54e7?w=500" },
-            { cat: "Bebidas", nombre: "Coca Cola", precio: 2.50, desc: "Lata 33cl.", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500", Modelo: "Original, Zero" },
-            { cat: "Bebidas", nombre: "Cerveza", precio: 3.00, desc: "Tercio Mahou.", img: "https://images.unsplash.com/photo-1550341914-8784ce899580?w=500" },
-            { cat: "Bebidas", nombre: "Agua Mineral", precio: 1.50, desc: "Botella 50cl.", img: "https://images.unsplash.com/photo-1560023907-5f339617ea30?w=500" },
-            { cat: "Bebidas", nombre: "Fanta Naranja", precio: 2.50, desc: "Lata 33cl.", img: "https://images.unsplash.com/photo-1624517452488-04869289c4ca?w=500" },
-            { cat: "Bebidas", nombre: "Nestea Té", precio: 2.50, desc: "Lata 33cl.", img: "https://images.unsplash.com/photo-1556881286-fc6915169721?w=500" },
-            { cat: "Bebidas", nombre: "Cerveza IPA", precio: 4.50, desc: "Artesana local.", img: "https://images.unsplash.com/photo-1584225065152-4a1454aa3d4e?w=500" },
-            { cat: "Postres", nombre: "Brownie Chocolate", precio: 5.50, desc: "Con nueces y helado.", img: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500" },
-            { cat: "Postres", nombre: "Tarta Queso", precio: 6.00, desc: "Estilo horneado muy cremosa.", img: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=500" },
-            { cat: "Postres", nombre: "Batido Vainilla", precio: 5.00, desc: "Con nata y sirope.", img: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=500" },
-            { cat: "Postres", nombre: "Batido Chocolate", precio: 5.00, desc: "Con chocolate belga.", img: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500" },
-            { cat: "Postres", nombre: "Cookies Pack", precio: 3.50, desc: "3 galletas recién horneadas.", img: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=500" },
-            { cat: "Postres", nombre: "Fruta Cortada", precio: 4.00, desc: "Temporada.", img: "https://images.unsplash.com/photo-1519996529931-28324d5a630e?w=500" }
-        ];
+        <div class="footerbar">
+          <button class="smallbtn danger" id="clearCartBtn" type="button">Vaciar carrito</button>
+          <span class="muted" style="font-size:12px;">Se guarda automáticamente</span>
+        </div>
 
-        // carrito: { n, p, o, q }
-        let carrito = [];
-        let seleccionActual = {};
+        <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">
 
-        function filterCat(cat) {
-            document.querySelectorAll('.cat-btn').forEach(b => {
-                b.classList.remove('bg-black', 'text-white');
-                b.classList.add('bg-gray-100', 'text-black');
-                if(b.innerText === cat) { b.classList.add('bg-black', 'text-white'); b.classList.remove('bg-gray-100'); }
-            });
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = PRODUCTOS.filter(p => p.cat === cat).map(p => `
-                <div onclick="openModal('${p.nombre.replace(/'/g,"\\'")}')" class="bg-white rounded-[2rem] p-3 border border-gray-100 flex flex-col shadow-sm cursor-pointer active:scale-95 transition-all">
-                    <img src="${p.img}" class="w-full aspect-square object-cover rounded-[1.5rem] mb-2">
-                    <h3 class="text-xs font-black uppercase tracking-tighter">${p.nombre}</h3>
-                    <p class="font-bold text-sm mt-1 text-black">${p.precio.toFixed(2)}€</p>
-                </div>
-            `).join('');
-        }
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <input id="custName" placeholder="Tu nombre" autocomplete="name" />
+          <input id="custPhone" placeholder="Tu teléfono (con prefijo si quieres)" autocomplete="tel" />
+          <textarea id="custAddress" placeholder="Dirección completa (calle, número, colonia, ciudad, CP)…" autocomplete="street-address"></textarea>
+          <textarea id="custNotes" placeholder="Notas (horario, referencias, sabor, talla/color, etc.) (opcional)"></textarea>
 
-        function openModal(nombre) {
-            const p = PRODUCTOS.find(prod => prod.nombre === nombre);
-            seleccionActual = {};
-            document.getElementById('modal-p-nombre').innerText = p.nombre;
-            document.getElementById('modal-p-img').src = p.img;
-            document.getElementById('modal-p-desc').innerText = p.desc;
-            document.getElementById('modal-p-precio').innerText = p.precio.toFixed(2) + "€";
-            const cont = document.getElementById('variantes-container');
-            cont.innerHTML = "";
+          <button id="whatsBtn" class="primary" type="button" disabled>
+            Enviar pedido por WhatsApp
+          </button>
 
-            // Mantengo tu sistema de claves, pero evito opciones vacías y lo hago robusto
-            ['Talla', 'Color', 'Material', 'Sabor', 'Modelo', 'Tipo'].forEach(key => {
-                if(p[key]) {
-                    const opciones = p[key].split(',')
-                        .map(o => o.trim())
-                        .filter(o => o.length > 0);
+          <div class="help">
+            Al enviar, se abrirá WhatsApp con el mensaje armado. El vendedor luego te compartirá su enlace de pago.
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
 
-                    if(opciones.length === 0) return;
+  <div style="margin-top:14px;color:var(--muted);font-size:12px;">
+    Demo educativa. No se almacenan pedidos en servidor: todo se arma en tu navegador y se envía por WhatsApp.
+  </div>
+</main>
 
-                    cont.innerHTML += `
-                        <label class="text-[10px] font-bold text-gray-400 block mb-2 uppercase">
-                            ${key === 'Color' ? 'Punto de Carne' : key}
-                        </label>
-                        <div class="flex gap-2 flex-wrap" id="g-${key}">
-                            ${opciones.map(o => `<button type="button" onclick="sel(this, '${key}', '${o.replace(/'/g,"\\'")}')" class="border-2 px-4 py-2 rounded-xl text-xs font-bold">${o}</button>`).join('')}
-                        </div>
-                    `;
-                }
-            });
+<script>
+/** =========================
+ *  Configuración
+ *  ========================= */
+const SELLER_PHONE_E164 = "34633817413"; // +34 633 817 413 -> wa.me exige sin "+"
+const SELLER_DISPLAY = "+34 633 817 413";
 
-            document.getElementById('add-from-modal').onclick = () => {
-                addToCart(p.nombre, p.precio, {...seleccionActual});
-                closeProductModal();
-            };
-            document.getElementById('product-modal').classList.remove('hidden');
-        }
+// Ajusta moneda a tu gusto: "MXN", "EUR", etc.
+const CURRENCY = "EUR";
 
-        function sel(btn, k, v) {
-            document.querySelectorAll(`#g-${k} button`).forEach(b => b.classList.remove('bg-black', 'text-white', 'border-black'));
-            btn.classList.add('bg-black', 'text-white', 'border-black');
-            seleccionActual[k] = v;
-        }
+// En esta demo el envío es 0 (puedes cambiarlo a número fijo o calcularlo).
+const SHIPPING_FLAT = 0;
 
-        // === MEJORA: sumar cantidades si es el mismo producto con las mismas opciones ===
-        function sameLine(a, n, o){
-            if(a.n !== n) return false;
-            const ao = a.o || {};
-            const bo = o || {};
-            const ak = Object.keys(ao).sort();
-            const bk = Object.keys(bo).sort();
-            if(ak.length !== bk.length) return false;
-            for(let i=0;i<ak.length;i++){
-                if(ak[i] !== bk[i]) return false;
-                if(ao[ak[i]] !== bo[bk[i]]) return false;
-            }
-            return true;
-        }
+/** =========================
+ *  Catálogo (18 productos: 3 categorías x 6)
+ *  Fotos: picsum.photos (públicas)
+ *  ========================= */
+const PRODUCTS = [
+  // --- Ropa (6) ---
+  {
+    id: "ropa-001",
+    category: "Ropa",
+    name: "Playera Premium Algodón",
+    price: 18.99,
+    image: "https://picsum.photos/seed/playera-premium/800/520",
+    description: "Algodón peinado, corte unisex. Ideal para diario."
+  },
+  {
+    id: "ropa-002",
+    category: "Ropa",
+    name: "Sudadera Oversize",
+    price: 34.50,
+    image: "https://picsum.photos/seed/sudadera-oversize/800/520",
+    description: "Felpa suave, estilo urbano. Tallas S–XL."
+  },
+  {
+    id: "ropa-003",
+    category: "Ropa",
+    name: "Gorra Bordada",
+    price: 14.00,
+    image: "https://picsum.photos/seed/gorra-bordada/800/520",
+    description: "Ajustable, bordado frontal. Unitalla."
+  },
+  {
+    id: "ropa-004",
+    category: "Ropa",
+    name: "Calcetas Deportivas (Pack x3)",
+    price: 9.90,
+    image: "https://picsum.photos/seed/calcetas-pack3/800/520",
+    description: "Transpirables, soporte en arco. 3 pares."
+  },
+  {
+    id: "ropa-005",
+    category: "Ropa",
+    name: "Bolsa Tote Resistente",
+    price: 12.75,
+    image: "https://picsum.photos/seed/tote-resistente/800/520",
+    description: "Lona gruesa, ideal para mandado o escuela."
+  },
+  {
+    id: "ropa-006",
+    category: "Ropa",
+    name: "Chamarra Ligera Rompevientos",
+    price: 39.99,
+    image: "https://picsum.photos/seed/rompevientos/800/520",
+    description: "Ligera, repelente a salpicaduras. Cierre frontal."
+  },
 
-        function addToCart(n, p, o) {
-            const idx = carrito.findIndex(x => sameLine(x, n, o));
-            if(idx >= 0) {
-                carrito[idx].q += 1;
-            } else {
-                carrito.push({ n, p, o, q: 1 });
-            }
-            updateCart();
-        }
+  // --- Hogar (6) ---
+  {
+    id: "hogar-001",
+    category: "Hogar",
+    name: "Vela Aromática (Vainilla)",
+    price: 11.50,
+    image: "https://picsum.photos/seed/vela-vainilla/800/520",
+    description: "Fragancia cálida, 35h aprox. Envase de vidrio."
+  },
+  {
+    id: "hogar-002",
+    category: "Hogar",
+    name: "Difusor de Varillas",
+    price: 16.90,
+    image: "https://picsum.photos/seed/difusor-varillas/800/520",
+    description: "Aroma suave constante. Incluye 6 varillas."
+  },
+  {
+    id: "hogar-003",
+    category: "Hogar",
+    name: "Taza Cerámica Minimal",
+    price: 8.20,
+    image: "https://picsum.photos/seed/taza-minimal/800/520",
+    description: "Resistente, apta microondas. 330ml."
+  },
+  {
+    id: "hogar-004",
+    category: "Hogar",
+    name: "Botella Térmica 500ml",
+    price: 19.99,
+    image: "https://picsum.photos/seed/botella-termica/800/520",
+    description: "Mantiene frío/calor. Acero inoxidable."
+  },
+  {
+    id: "hogar-005",
+    category: "Hogar",
+    name: "Organizador de Escritorio",
+    price: 13.40,
+    image: "https://picsum.photos/seed/organizador-escritorio/800/520",
+    description: "Ordena plumas, notas y cables. Compacto."
+  },
+  {
+    id: "hogar-006",
+    category: "Hogar",
+    name: "Set Toallas (2 piezas)",
+    price: 21.00,
+    image: "https://picsum.photos/seed/set-toallas/800/520",
+    description: "Suaves, absorbentes. 1 grande + 1 mediana."
+  },
 
-        // === MEJORA: + / - / eliminar ===
-        function incItem(i){ carrito[i].q += 1; updateCart(); }
-        function decItem(i){
-            carrito[i].q -= 1;
-            if(carrito[i].q <= 0) carrito.splice(i,1);
-            updateCart();
-        }
-        function delItem(i){ carrito.splice(i,1); updateCart(); }
+  // --- Alimentos (6) ---
+  {
+    id: "food-001",
+    category: "Alimentos",
+    name: "Café Molido Artesanal 250g",
+    price: 10.90,
+    image: "https://picsum.photos/seed/cafe-artesanal/800/520",
+    description: "Tueste medio, notas a chocolate. 250g."
+  },
+  {
+    id: "food-002",
+    category: "Alimentos",
+    name: "Granola Crujiente 400g",
+    price: 7.80,
+    image: "https://picsum.photos/seed/granola-crujiente/800/520",
+    description: "Avena, nuez y miel. Ideal con yogurt."
+  },
+  {
+    id: "food-003",
+    category: "Alimentos",
+    name: "Miel Pura 350g",
+    price: 9.60,
+    image: "https://picsum.photos/seed/miel-pura/800/520",
+    description: "Miel 100% natural. Envasada localmente."
+  },
+  {
+    id: "food-004",
+    category: "Alimentos",
+    name: "Salsa Picante (Nivel Medio)",
+    price: 5.40,
+    image: "https://picsum.photos/seed/salsa-picante/800/520",
+    description: "Equilibrada, buen sabor. 150ml."
+  },
+  {
+    id: "food-005",
+    category: "Alimentos",
+    name: "Galletas Caseras (Caja x12)",
+    price: 12.00,
+    image: "https://picsum.photos/seed/galletas-caseras/800/520",
+    description: "Surtido. Perfectas para regalo."
+  },
+  {
+    id: "food-006",
+    category: "Alimentos",
+    name: "Chocolate Amargo 70% (Barra)",
+    price: 4.90,
+    image: "https://picsum.photos/seed/chocolate-70/800/520",
+    description: "Sabor intenso. 80g."
+  },
+];
 
-        function updateCart() {
-            document.getElementById('cart-count').innerText = carrito.reduce((acc,x)=>acc + x.q, 0);
+/** =========================
+ *  Estado + Persistencia
+ *  ========================= */
+const LS_KEY = "demo_whatsapp_shop_v1";
+const state = loadState() || {
+  cart: {}, // { productId: qty }
+  customer: { name:"", phone:"", address:"", notes:"" },
+  ui: { search:"", category:"__all__" }
+};
 
-            let subtotal = 0;
+function loadState(){
+  try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch { return null; }
+}
+function saveState(){
+  localStorage.setItem(LS_KEY, JSON.stringify(state));
+}
 
-            const itemsEl = document.getElementById('cart-items');
-            if(carrito.length === 0){
-                itemsEl.innerHTML = `<div class="text-sm font-bold text-gray-400">Tu carrito está vacío.</div>`;
-                document.getElementById('total-val').innerText = `0.00€`;
-                return;
-            }
+/** =========================
+ *  Helpers
+ *  ========================= */
+const money = (n) =>
+  new Intl.NumberFormat("es-ES", { style:"currency", currency: CURRENCY, maximumFractionDigits: 2 }).format(n);
 
-            itemsEl.innerHTML = carrito.map((p, idx) => {
-                subtotal += p.p * p.q;
-                const opts = Object.values(p.o || {}).filter(Boolean).join(' / ');
-                return `
-                <div class="bg-gray-50 p-3 rounded-2xl text-xs font-bold flex justify-between gap-3">
-                    <div class="min-w-0">
-                        <span class="block truncate">${p.n}</span>
-                        <small class="text-gray-400">${opts}</small>
-                        <div class="mt-2 text-[10px] font-black text-gray-500">${(p.p).toFixed(2)}€ unidad</div>
-                    </div>
-                    <div class="flex flex-col items-end gap-2 shrink-0">
-                        <span>${(p.p * p.q).toFixed(2)}€</span>
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="decItem(${idx})" class="h-8 w-8 rounded-xl bg-white border font-black">−</button>
-                            <span class="min-w-[18px] text-center">${p.q}</span>
-                            <button type="button" onclick="incItem(${idx})" class="h-8 w-8 rounded-xl bg-white border font-black">+</button>
-                            <button type="button" onclick="delItem(${idx})" class="h-8 w-8 rounded-xl bg-white border text-red-600 font-black">×</button>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
+function getProductById(id){ return PRODUCTS.find(p => p.id === id); }
 
-            document.getElementById('total-val').innerText = subtotal.toFixed(2) + "€";
-        }
+function cartItems(){
+  return Object.entries(state.cart)
+    .map(([id, qty]) => ({ product: getProductById(id), qty: Number(qty) }))
+    .filter(x => x.product && x.qty > 0);
+}
 
-        function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
-        function toggleCart() {
-            document.getElementById('cart-modal').classList.toggle('hidden');
-            actualizarEstadoLocal();
-        }
+function cartCount(){
+  return cartItems().reduce((sum, x) => sum + x.qty, 0);
+}
 
-        // === MEJORA: dirección solo si domicilio ===
-        function syncAddressUI(){
-            const modo = document.getElementById('entrega-modo').value;
-            const wrap = document.getElementById('address-wrap');
-            const addr = document.getElementById('cust-address');
-            const esDomicilio = (modo === "Domicilio");
-            wrap.classList.toggle('hidden', !esDomicilio);
-            if(!esDomicilio) addr.value = "";
-        }
+function subtotal(){
+  return cartItems().reduce((sum, x) => sum + x.qty * x.product.price, 0);
+}
 
-        function enviarPedido() {
-            // Horario
-            if(!estaAbiertoAhora()){
-                return alert(`Ahora mismo estamos cerrados. Horario: ${HORARIO.ABRE}:00–${HORARIO.CIERRA}:00`);
-            }
+/** =========================
+ *  UI Elements
+ *  ========================= */
+const elProducts = document.getElementById("products");
+const elCategory = document.getElementById("category");
+const elSearch = document.getElementById("search");
+const elCart = document.getElementById("cart");
+const elCartEmpty = document.getElementById("cartEmpty");
+const elCartCount = document.getElementById("cartCount");
+const elCartTotal = document.getElementById("cartTotal");
+const elSubtotal = document.getElementById("subtotal");
+const elShipping = document.getElementById("shipping");
+const elTotal = document.getElementById("total");
+const elWhatsBtn = document.getElementById("whatsBtn");
+const elClearCartBtn = document.getElementById("clearCartBtn");
 
-            const nombre = document.getElementById('cust-name').value.trim();
-            const tlf = document.getElementById('cust-phone').value.trim();
-            const addr = document.getElementById('cust-address').value.trim();
-            const modo = document.getElementById('entrega-modo').value;
-            const pago = document.getElementById('pago-metodo').value;
-            const hora = document.getElementById('entrega-tipo').value === 'Programar' ? document.getElementById('entrega-hora').value : "Lo antes posible";
+const elCustName = document.getElementById("custName");
+const elCustPhone = document.getElementById("custPhone");
+const elCustAddress = document.getElementById("custAddress");
+const elCustNotes = document.getElementById("custNotes");
 
-            if(carrito.length === 0) return alert("Tu carrito está vacío.");
+document.getElementById("sellerPhoneLabel").textContent = SELLER_DISPLAY;
 
-            // Validaciones mínimas (mejoradas)
-            if(!nombre || !tlf) return alert("Completa tu nombre y teléfono.");
-            if(modo === "Domicilio" && !addr) return alert("Falta la dirección para entrega a domicilio.");
+/** =========================
+ *  Render: Category options
+ *  ========================= */
+function renderCategories(){
+  const cats = Array.from(new Set(PRODUCTS.map(p => p.category))).sort((a,b)=>a.localeCompare(b,"es"));
+  // keep first option
+  const keep = elCategory.querySelector('option[value="__all__"]');
+  elCategory.innerHTML = "";
+  elCategory.appendChild(keep);
+  cats.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c; opt.textContent = c;
+    elCategory.appendChild(opt);
+  });
 
-            // Calcular total + lista con cantidades
-            let lista = "";
-            let sub = 0;
-            carrito.forEach(p => {
-                const opts = Object.values(p.o || {}).filter(Boolean).join(' / ');
-                const linea = opts ? ` [${opts}]` : "";
-                lista += `• x${p.q} ${p.n}${linea} (${(p.p * p.q).toFixed(2)}€)%0A`;
-                sub += p.p * p.q;
-            });
+  elCategory.value = state.ui.category || "__all__";
+}
 
-            if(PEDIDO_MINIMO > 0 && sub < PEDIDO_MINIMO){
-                return alert(`Pedido mínimo: ${PEDIDO_MINIMO.toFixed(2)}€`);
-            }
+/** =========================
+ *  Render: Products list
+ *  ========================= */
+function filteredProducts(){
+  const q = (state.ui.search || "").trim().toLowerCase();
+  const cat = state.ui.category || "__all__";
+  return PRODUCTS.filter(p => {
+    const okCat = (cat === "__all__") || (p.category === cat);
+    const hay = (p.name + " " + p.description + " " + p.category).toLowerCase();
+    const okQ = !q || hay.includes(q);
+    return okCat && okQ;
+  });
+}
 
-            const lugar = (modo === "Domicilio") ? addr : "Recoger en local";
+function renderProducts(){
+  const list = filteredProducts();
 
-            const msj =
-`*📦 NUEVO PEDIDO BURGER*%0A` +
-`👤 *CLIENTE:* ${encodeURIComponent(nombre)}%0A` +
-`📞 *TELÉFONO:* ${encodeURIComponent(tlf)}%0A` +
-`📍 *LUGAR:* ${encodeURIComponent(lugar)}%0A` +
-`🚚 *TIPO:* ${encodeURIComponent(modo)}%0A` +
-`⏰ *HORA:* ${encodeURIComponent(hora)}%0A` +
-`💳 *PAGO:* ${encodeURIComponent(pago)}%0A` +
-`------------------%0A` +
-`🛍️ *PEDIDO:*%0A${lista}%0A` +
-`📝 *NOTAS:* ${encodeURIComponent(document.getElementById('cust-notes').value.trim() || 'Ninguna')}%0A` +
-`💰 *TOTAL: ${sub.toFixed(2)}€*%0A` +
-`------------------%0A` +
-`🔄 _Confirme recepción para empezar a cocinar._`;
+  elProducts.innerHTML = "";
+  list.forEach(p => {
+    const inCart = state.cart[p.id] || 0;
 
-            window.open(`https://wa.me/${WHATSAPP_RESTAURANTE}?text=${msj}`, '_blank');
-        }
+    const card = document.createElement("div");
+    card.className = "card";
 
-        // Horas programadas
-        for(let h=19; h<=23; h++) for(let m=0; m<60; m+=15)
-            document.getElementById('entrega-hora').innerHTML += `<option value="${h}:${m==0?'00':m}">A las ${h}:${m==0?'00':m}</option>`;
+    const img = document.createElement("img");
+    img.src = p.image;
+    img.alt = p.name;
 
-        // Init
-        document.getElementById('minimo-ui').innerText = PEDIDO_MINIMO > 0 ? `${PEDIDO_MINIMO.toFixed(2)}€` : `Sin mínimo`;
-        document.getElementById('entrega-modo').addEventListener('change', syncAddressUI);
+    const meta = document.createElement("div");
+    meta.className = "meta";
 
-        filterCat('Hamburguesas');
-        updateCart();
-        syncAddressUI();
-        actualizarEstadoLocal();
-        setInterval(actualizarEstadoLocal, 30_000);
-    </script>
+    const row1 = document.createElement("div");
+    row1.className = "row";
+    const h = document.createElement("p");
+    h.className = "name";
+    h.textContent = p.name;
+
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = p.category;
+
+    row1.appendChild(h);
+    row1.appendChild(badge);
+
+    const d = document.createElement("p");
+    d.className = "desc";
+    d.textContent = p.description;
+
+    const row2 = document.createElement("div");
+    row2.className = "row";
+    const price = document.createElement("div");
+    price.className = "price";
+    price.textContent = money(p.price);
+
+    const btnrow = document.createElement("div");
+    btnrow.className = "btnrow";
+
+    const add = document.createElement("button");
+    add.className = "primary";
+    add.type = "button";
+    add.textContent = inCart ? `Agregar (+1) · En carrito: ${inCart}` : "Agregar al carrito";
+    add.onclick = () => addToCart(p.id, 1);
+
+    const less = document.createElement("button");
+    less.type = "button";
+    less.textContent = "Quitar (-1)";
+    less.disabled = !inCart;
+    less.onclick = () => addToCart(p.id, -1);
+
+    btnrow.appendChild(add);
+    btnrow.appendChild(less);
+
+    row2.appendChild(price);
+
+    meta.appendChild(row1);
+    meta.appendChild(d);
+    meta.appendChild(row2);
+    meta.appendChild(btnrow);
+
+    card.appendChild(img);
+    card.appendChild(meta);
+
+    elProducts.appendChild(card);
+  });
+
+  if(list.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "warnbox";
+    empty.textContent = "No hay productos con ese filtro/búsqueda.";
+    elProducts.appendChild(empty);
+  }
+}
+
+/** =========================
+ *  Cart operations + render
+ *  ========================= */
+function addToCart(productId, delta){
+  const current = Number(state.cart[productId] || 0);
+  const next = Math.max(0, current + delta);
+  if(next === 0) delete state.cart[productId];
+  else state.cart[productId] = next;
+
+  saveState();
+  renderAll();
+}
+
+function setQty(productId, qty){
+  const q = Math.max(0, Number(qty || 0));
+  if(q === 0) delete state.cart[productId];
+  else state.cart[productId] = q;
+
+  saveState();
+  renderAll();
+}
+
+function clearCart(){
+  state.cart = {};
+  saveState();
+  renderAll();
+}
+
+function renderCart(){
+  const items = cartItems();
+  const count = cartCount();
+  const sub = subtotal();
+  const ship = SHIPPING_FLAT;
+  const tot = sub + ship;
+
+  elCartCount.textContent = String(count);
+  elCartTotal.textContent = money(tot);
+
+  elSubtotal.textContent = money(sub);
+  elShipping.textContent = money(ship);
+  elTotal.textContent = money(tot);
+
+  if(items.length === 0){
+    elCart.style.display = "none";
+    elCartEmpty.style.display = "block";
+  } else {
+    elCart.style.display = "flex";
+    elCartEmpty.style.display = "none";
+  }
+
+  elCart.innerHTML = "";
+  items.forEach(({product, qty}) => {
+    const row = document.createElement("div");
+    row.className = "cartitem";
+
+    const img = document.createElement("img");
+    img.className = "thumb";
+    img.src = product.image;
+    img.alt = product.name;
+
+    const meta = document.createElement("div");
+    meta.className = "cartmeta";
+
+    const title = document.createElement("p");
+    title.className = "title";
+    title.textContent = product.name;
+
+    const subline = document.createElement("div");
+    subline.className = "sub";
+    subline.textContent = `${product.category} · ${money(product.price)} c/u`;
+
+    const qtyrow = document.createElement("div");
+    qtyrow.className = "qtyrow";
+
+    const minus = document.createElement("button");
+    minus.className = "qtybtn";
+    minus.type = "button";
+    minus.textContent = "−";
+    minus.onclick = () => addToCart(product.id, -1);
+
+    const q = document.createElement("div");
+    q.className = "qty";
+    q.textContent = String(qty);
+
+    const plus = document.createElement("button");
+    plus.className = "qtybtn";
+    plus.type = "button";
+    plus.textContent = "+";
+    plus.onclick = () => addToCart(product.id, 1);
+
+    const del = document.createElement("button");
+    del.className = "qtybtn danger";
+    del.type = "button";
+    del.textContent = "Eliminar";
+    del.onclick = () => setQty(product.id, 0);
+
+    const lineTotal = document.createElement("div");
+    lineTotal.className = "sub";
+    lineTotal.style.marginLeft = "auto";
+    lineTotal.style.fontVariantNumeric = "tabular-nums";
+    lineTotal.textContent = money(product.price * qty);
+
+    qtyrow.appendChild(minus);
+    qtyrow.appendChild(q);
+    qtyrow.appendChild(plus);
+    qtyrow.appendChild(del);
+    qtyrow.appendChild(lineTotal);
+
+    meta.appendChild(title);
+    meta.appendChild(subline);
+    meta.appendChild(qtyrow);
+
+    row.appendChild(img);
+    row.appendChild(meta);
+
+    elCart.appendChild(row);
+  });
+
+  updateWhatsBtnState();
+}
+
+/** =========================
+ *  Customer form
+ *  ========================= */
+function hydrateCustomer(){
+  elCustName.value = state.customer.name || "";
+  elCustPhone.value = state.customer.phone || "";
+  elCustAddress.value = state.customer.address || "";
+  elCustNotes.value = state.customer.notes || "";
+}
+
+function saveCustomerFromInputs(){
+  state.customer.name = elCustName.value.trim();
+  state.customer.phone = elCustPhone.value.trim();
+  state.customer.address = elCustAddress.value.trim();
+  state.customer.notes = elCustNotes.value.trim();
+  saveState();
+  updateWhatsBtnState();
+}
+
+["input","change"].forEach(evt=>{
+  elCustName.addEventListener(evt, saveCustomerFromInputs);
+  elCustPhone.addEventListener(evt, saveCustomerFromInputs);
+  elCustAddress.addEventListener(evt, saveCustomerFromInputs);
+  elCustNotes.addEventListener(evt, saveCustomerFromInputs);
+});
+
+function updateWhatsBtnState(){
+  const items = cartItems();
+  const hasItems = items.length > 0;
+  const nameOk = (state.customer.name || "").length >= 2;
+  const addrOk = (state.customer.address || "").length >= 6;
+  const phoneOk = (state.customer.phone || "").length >= 6; // flexible
+  elWhatsBtn.disabled = !(hasItems && nameOk && addrOk && phoneOk);
+}
+
+/** =========================
+ *  WhatsApp message builder
+ *  ========================= */
+function buildWhatsMessage(){
+  const items = cartItems();
+  const sub = subtotal();
+  const ship = SHIPPING_FLAT;
+  const tot = sub + ship;
+
+  const lines = [];
+  lines.push("🛒 *NUEVO PEDIDO*");
+  lines.push("");
+  lines.push(`👤 *Nombre:* ${state.customer.name}`);
+  lines.push(`📞 *Teléfono:* ${state.customer.phone}`);
+  lines.push(`📍 *Dirección:* ${state.customer.address}`);
+  if(state.customer.notes){
+    lines.push(`📝 *Notas:* ${state.customer.notes}`);
+  }
+  lines.push("");
+  lines.push("*Productos:*");
+
+  items.forEach(({product, qty}) => {
+    const line = `- ${product.name} x${qty} — ${money(product.price * qty)}`;
+    lines.push(line);
+  });
+
+  lines.push("");
+  lines.push(`Subtotal: ${money(sub)}`);
+  lines.push(`Envío: ${money(ship)}`);
+  lines.push(`*Total: ${money(tot)}*`);
+  lines.push("");
+  lines.push("✅ Confirmo este pedido. ¿Me compartes el enlace de pago?");
+  return lines.join("\n");
+}
+
+function openWhatsApp(){
+  const msg = buildWhatsMessage();
+  const url = `https://wa.me/${SELLER_PHONE_E164}?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+/** =========================
+ *  Wire up UI events
+ *  ========================= */
+elSearch.addEventListener("input", () => {
+  state.ui.search = elSearch.value;
+  saveState();
+  renderProducts();
+});
+
+elCategory.addEventListener("change", () => {
+  state.ui.category = elCategory.value;
+  saveState();
+  renderProducts();
+});
+
+elWhatsBtn.addEventListener("click", openWhatsApp);
+elClearCartBtn.addEventListener("click", clearCart);
+
+/** =========================
+ *  Initial render
+ *  ========================= */
+function renderAll(){
+  // Restore filters
+  elSearch.value = state.ui.search || "";
+  elCategory.value = state.ui.category || "__all__";
+
+  renderProducts();
+  renderCart();
+}
+
+renderCategories();
+hydrateCustomer();
+renderAll();
+</script>
 </body>
 </html>
