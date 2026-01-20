@@ -1,218 +1,216 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger Master | Demo Profesional</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root { --btn: #000000; --txt: #000000; --bg: #f9fafb; }
-        body { background-color: var(--bg); color: var(--txt); font-family: system-ui, -apple-system, sans-serif; }
-        .btn-principal { background-color: var(--btn) !important; color: white; }
-        .modal-animate { animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo Pedido WhatsApp</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+  --color: #000;
+}
+.btn { background: var(--color); color:white; }
+</style>
 </head>
-<body class="pb-20">
 
-    <header class="bg-white sticky top-0 z-40 border-b shadow-sm">
-        <div class="max-w-md mx-auto px-5 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-black italic tracking-tighter uppercase">BURGER MASTER 🍔</h1>
-            <button onclick="toggleCart()" class="relative p-2 bg-gray-100 rounded-full">
-                <i class="fa-solid fa-shopping-bag text-xl"></i>
-                <span id="cart-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
-            </button>
+<body class="bg-gray-50 pb-24">
+
+<script>
+// ================= CONFIGURACIÓN =================
+const WHATSAPP = "34614154983";
+const PEDIDO_MINIMO = 15;
+const HORARIO = { abre: 19, cierra: 23 }; // 24h
+
+const PRODUCTOS = [
+  {
+    cat:"Hamburguesas",
+    nombre:"Clásica",
+    precio:10.5,
+    img:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500",
+    desc:"Vacuno, queso, lechuga y tomate",
+    variantes:{
+      "Punto de carne":["Al punto","Muy hecha"]
+    }
+  },
+  {
+    cat:"Hamburguesas",
+    nombre:"Bacon Cheese",
+    precio:12.5,
+    img:"https://images.unsplash.com/photo-1553979459-d2229ba7143b?w=500",
+    desc:"Doble cheddar y bacon",
+    variantes:{
+      "Punto de carne":["Al punto","Muy hecha"]
+    }
+  },
+  {
+    cat:"Entrantes",
+    nombre:"Patatas",
+    precio:4.5,
+    img:"https://images.unsplash.com/photo-1573015084185-7205ba3d6f2e?w=500",
+    desc:"Corte casero"
+  }
+];
+// ===============================================
+
+let carrito = [];
+let seleccion = {};
+let catActual = "Hamburguesas";
+
+function abierto(){
+  const h = new Date().getHours();
+  return h >= HORARIO.abre && h < HORARIO.cierra;
+}
+
+function renderProductos(){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = PRODUCTOS
+    .filter(p=>p.cat===catActual)
+    .map(p=>`
+    <div onclick="abrirModal('${p.nombre}')" class="bg-white rounded-2xl p-3 shadow cursor-pointer">
+      <img src="${p.img}" class="rounded-xl aspect-square object-cover mb-2">
+      <h3 class="font-black text-sm">${p.nombre}</h3>
+      <p class="font-bold">${p.precio.toFixed(2)}€</p>
+    </div>`).join("");
+}
+
+function abrirModal(nombre){
+  const p = PRODUCTOS.find(x=>x.nombre===nombre);
+  seleccion = {};
+  document.getElementById("m-nombre").innerText = p.nombre;
+  document.getElementById("m-img").src = p.img;
+  document.getElementById("m-desc").innerText = p.desc;
+  document.getElementById("m-precio").innerText = p.precio.toFixed(2)+"€";
+
+  const cont = document.getElementById("m-var");
+  cont.innerHTML="";
+  if(p.variantes){
+    Object.keys(p.variantes).forEach(k=>{
+      cont.innerHTML+=`
+      <div>
+        <p class="text-xs font-bold text-gray-400">${k}</p>
+        <div class="flex gap-2 mt-1">
+          ${p.variantes[k].map(v=>`
+            <button onclick="selVar('${k}','${v}',this)"
+            class="border px-3 py-2 rounded-xl text-xs font-bold">${v}</button>
+          `).join("")}
         </div>
-        <div class="max-w-md mx-auto px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-t bg-white">
-            <button onclick="filterCat('Hamburguesas')" class="cat-btn bg-black text-white px-5 py-2 rounded-full text-xs font-bold shrink-0">Hamburguesas</button>
-            <button onclick="filterCat('Entrantes')" class="cat-btn bg-gray-100 text-black px-5 py-2 rounded-full text-xs font-bold shrink-0">Entrantes</button>
-            <button onclick="filterCat('Bebidas')" class="cat-btn bg-gray-100 text-black px-5 py-2 rounded-full text-xs font-bold shrink-0">Bebidas</button>
-            <button onclick="filterCat('Postres')" class="cat-btn bg-gray-100 text-black px-5 py-2 rounded-full text-xs font-bold shrink-0">Postres</button>
-        </div>
-    </header>
+      </div>`;
+    });
+  }
 
-    <main id="product-grid" class="max-w-md mx-auto px-5 py-6 grid grid-cols-2 gap-4"></main>
+  document.getElementById("add").onclick=()=>{
+    carrito.push({p,cantidad:1,vars:{...seleccion}});
+    cerrarModal();
+    renderCarrito();
+  };
+  document.getElementById("modal").classList.remove("hidden");
+}
 
-    <div id="product-modal" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-end sm:items-center justify-center backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] p-6 max-h-[90vh] overflow-y-auto modal-animate">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="modal-p-nombre" class="text-xl font-black uppercase"></h3>
-                <button onclick="closeProductModal()" class="text-3xl text-gray-300">&times;</button>
-            </div>
-            <img id="modal-p-img" src="" class="w-full aspect-square object-cover rounded-[2rem] mb-4 shadow-md">
-            <p id="modal-p-desc" class="text-gray-500 text-sm mb-6"></p>
-            <div id="variantes-container" class="space-y-6 mb-8"></div>
-            <div class="flex items-center justify-between gap-4 sticky bottom-0 bg-white pt-3 border-t">
-                <span id="modal-p-precio" class="text-2xl font-black"></span>
-                <button id="add-from-modal" class="flex-grow btn-principal py-4 rounded-2xl font-bold uppercase text-xs tracking-widest">Añadir</button>
-            </div>
-        </div>
-    </div>
+function selVar(k,v,b){
+  seleccion[k]=v;
+  [...b.parentNode.children].forEach(x=>x.classList.remove("bg-black","text-white"));
+  b.classList.add("bg-black","text-white");
+}
 
-    <div id="cart-modal" class="fixed inset-0 bg-black/50 z-[70] hidden backdrop-blur-sm">
-        <div class="bg-white w-full max-w-sm h-full ml-auto flex flex-col p-6 shadow-2xl overflow-y-auto">
-            <div class="flex justify-between items-center border-b pb-4 mb-4">
-                <h2 class="text-xl font-black uppercase">Tu Carrito</h2>
-                <button onclick="toggleCart()" class="text-3xl text-gray-300">&times;</button>
-            </div>
-            <div id="cart-items" class="space-y-3 mb-6"></div>
-            
-            <div class="space-y-4 border-t pt-4">
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400">Tipo de Entrega</label>
-                    <select id="entrega-modo" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm mt-1">
-                        <option value="Domicilio">A Domicilio 🏠</option>
-                        <option value="Recoger">Para Recoger 🥡</option>
-                    </select>
-                </div>
+function cerrarModal(){ document.getElementById("modal").classList.add("hidden"); }
 
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400">¿Para cuándo?</label>
-                    <select id="entrega-tipo" onchange="document.getElementById('entrega-hora').classList.toggle('hidden', this.value !== 'Programar')" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm mt-1">
-                        <option value="Lo antes posible">Lo antes posible ⚡</option>
-                        <option value="Programar">Seleccionar hora ⏰</option>
-                    </select>
-                    <select id="entrega-hora" class="hidden w-full p-3 mt-2 bg-gray-50 border rounded-xl font-bold text-sm text-blue-600"></select>
-                </div>
+function renderCarrito(){
+  const cont = document.getElementById("carrito");
+  let total=0;
+  cont.innerHTML=carrito.map((i,idx)=>{
+    total+=i.p.precio*i.cantidad;
+    return`
+    <div class="bg-gray-100 p-3 rounded-xl text-xs font-bold flex justify-between items-center">
+      <div>
+        ${i.p.nombre}<br>
+        <small>${Object.values(i.vars).join(" / ")}</small>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="cambiar(${idx},-1)">➖</button>
+        ${i.cantidad}
+        <button onclick="cambiar(${idx},1)">➕</button>
+        <button onclick="eliminar(${idx})">❌</button>
+      </div>
+    </div>`;
+  }).join("");
 
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400">Método de Pago</label>
-                    <select id="pago-metodo" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm mt-1">
-                        <option value="Efectivo">Efectivo 💵</option>
-                        <option value="Tarjeta">Tarjeta (Datafono) 💳</option>
-                    </select>
-                </div>
+  document.getElementById("total").innerText = total.toFixed(2)+"€";
+}
 
-                <textarea id="cust-notes" placeholder="Notas (sin cebolla, alergias...)" class="w-full p-3 bg-gray-50 border rounded-xl text-sm h-16"></textarea>
-                <input type="text" id="cust-name" placeholder="Tu Nombre" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
-                <input type="tel" id="cust-phone" placeholder="Tu Teléfono" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
-                <input type="text" id="cust-address" placeholder="Dirección completa" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
+function cambiar(i,d){
+  carrito[i].cantidad+=d;
+  if(carrito[i].cantidad<=0) carrito.splice(i,1);
+  renderCarrito();
+}
+function eliminar(i){ carrito.splice(i,1); renderCarrito(); }
 
-                <div class="flex justify-between text-2xl font-black pt-2">
-                    <span>TOTAL:</span>
-                    <span id="total-val">0.00€</span>
-                </div>
-                <button onclick="enviarPedido()" class="w-full btn-principal py-5 rounded-2xl font-black text-sm uppercase flex items-center justify-center gap-3 mb-10">
-                    <i class="fa-brands fa-whatsapp text-2xl"></i> HACER PEDIDO
-                </button>
-            </div>
-        </div>
-    </div>
+function enviar(){
+  if(!abierto()) return alert("Estamos cerrados");
+  const modo = document.getElementById("modo").value;
+  const nombre = document.getElementById("nombre").value;
+  const tel = document.getElementById("tel").value;
+  const dir = document.getElementById("dir").value;
 
-    <script>
-        const WHATSAPP_RESTAURANTE = "34614154983"; 
-        const PRODUCTOS = [
-            { cat: "Hamburguesas", nombre: "La Clásica", precio: 10.50, desc: "Carne 100% vacuno, queso, lechuga y tomate.", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500", Color: "Al punto, Muy hecha, Sangrante" },
-            { cat: "Hamburguesas", nombre: "Bacon Cheese", precio: 12.50, desc: "Mucho bacon crujiente y doble cheddar fundido.", img: "https://images.unsplash.com/photo-1553979459-d2229ba7143b?w=500", Color: "Al punto, Muy hecha" },
-            { cat: "Hamburguesas", nombre: "Trufa & Setas", precio: 14.90, desc: "Crema de trufa negra y mix de setas salteadas.", img: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=500", Color: "Al punto, Muy hecha" },
-            { cat: "Hamburguesas", nombre: "La Picante", precio: 11.90, desc: "Jalapeños, salsa brava y queso pepper jack.", img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500", Color: "Al punto, Muy hecha" },
-            { cat: "Hamburguesas", nombre: "Pollo Crispy", precio: 10.00, desc: "Contramuslo de pollo super crujiente y col slow.", img: "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=500" },
-            { cat: "Hamburguesas", nombre: "Vegan Burger", precio: 11.00, desc: "Carne vegetal Beyond Meat y queso vegano.", img: "https://images.unsplash.com/photo-1512152272829-e3139592d56f?w=500" },
-            { cat: "Entrantes", nombre: "Patatas Fritas", precio: 4.50, desc: "Corte grueso casero con sal marina.", img: "https://images.unsplash.com/photo-1573015084185-7205ba3d6f2e?w=500", Sabor: "Ketchup, Mayonesa, Mostaza" },
-            { cat: "Entrantes", nombre: "Nachos Supreme", precio: 9.00, desc: "Guacamole, nata agria y chili con carne.", img: "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=500" },
-            { cat: "Entrantes", nombre: "Aros de Cebolla", precio: 5.50, desc: "8 unidades con salsa BBQ.", img: "https://images.unsplash.com/photo-1639024471283-03518883512d?w=500" },
-            { cat: "Entrantes", nombre: "Nuggets Pollo", precio: 6.00, desc: "6 unidades de pollo real rebozado.", img: "https://images.unsplash.com/photo-1562967914-608f82629710?w=500" },
-            { cat: "Entrantes", nombre: "Tequeños Queso", precio: 7.50, desc: "5 palitos de queso con mermelada.", img: "https://images.unsplash.com/photo-1541529086526-db283c563270?w=500" },
-            { cat: "Entrantes", nombre: "Ensalada Col", precio: 4.00, desc: "Receta americana clásica.", img: "https://images.unsplash.com/photo-1625944525533-473f1a3d54e7?w=500" },
-            { cat: "Bebidas", nombre: "Coca Cola", precio: 2.50, desc: "Lata 33cl.", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500", Modelo: "Original, Zero" },
-            { cat: "Bebidas", nombre: "Cerveza", precio: 3.00, desc: "Tercio Mahou.", img: "https://images.unsplash.com/photo-1550341914-8784ce899580?w=500" },
-            { cat: "Bebidas", nombre: "Agua Mineral", precio: 1.50, desc: "Botella 50cl.", img: "https://images.unsplash.com/photo-1560023907-5f339617ea30?w=500" },
-            { cat: "Bebidas", nombre: "Fanta Naranja", precio: 2.50, desc: "Lata 33cl.", img: "https://images.unsplash.com/photo-1624517452488-04869289c4ca?w=500" },
-            { cat: "Bebidas", nombre: "Nestea Té", precio: 2.50, desc: "Lata 33cl.", img: "https://images.unsplash.com/photo-1556881286-fc6915169721?w=500" },
-            { cat: "Bebidas", nombre: "Cerveza IPA", precio: 4.50, desc: "Artesana local.", img: "https://images.unsplash.com/photo-1584225065152-4a1454aa3d4e?w=500" },
-            { cat: "Postres", nombre: "Brownie Chocolate", precio: 5.50, desc: "Con nueces y helado.", img: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500" },
-            { cat: "Postres", nombre: "Tarta Queso", precio: 6.00, desc: "Estilo horneado muy cremosa.", img: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=500" },
-            { cat: "Postres", nombre: "Batido Vainilla", precio: 5.00, desc: "Con nata y sirope.", img: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=500" },
-            { cat: "Postres", nombre: "Batido Chocolate", precio: 5.00, desc: "Con chocolate belga.", img: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500" },
-            { cat: "Postres", nombre: "Cookies Pack", precio: 3.50, desc: "3 galletas recién horneadas.", img: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=500" },
-            { cat: "Postres", nombre: "Fruta Cortada", precio: 4.00, desc: "Temporada.", img: "https://images.unsplash.com/photo-1519996529931-28324d5a630e?w=500" }
-        ];
+  if(!nombre || !tel) return alert("Faltan datos");
+  if(modo==="Domicilio" && !dir) return alert("Falta dirección");
 
-        let carrito = [];
-        let seleccionActual = {};
+  let total=0;
+  let lista="";
+  carrito.forEach(i=>{
+    total+=i.p.precio*i.cantidad;
+    lista+=`• ${i.cantidad}x ${i.p.nombre} (${i.p.precio}€)%0A`;
+  });
 
-        function filterCat(cat) {
-            document.querySelectorAll('.cat-btn').forEach(b => {
-                b.classList.remove('bg-black', 'text-white');
-                b.classList.add('bg-gray-100', 'text-black');
-                if(b.innerText === cat) { b.classList.add('bg-black', 'text-white'); b.classList.remove('bg-gray-100'); }
-            });
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = PRODUCTOS.filter(p => p.cat === cat).map(p => `
-                <div onclick="openModal('${p.nombre}')" class="bg-white rounded-[2rem] p-3 border border-gray-100 flex flex-col shadow-sm cursor-pointer active:scale-95 transition-all">
-                    <img src="${p.img}" class="w-full aspect-square object-cover rounded-[1.5rem] mb-2">
-                    <h3 class="text-xs font-black uppercase tracking-tighter">${p.nombre}</h3>
-                    <p class="font-bold text-sm mt-1 text-black">${p.precio.toFixed(2)}€</p>
-                </div>
-            `).join('');
-        }
+  if(total < PEDIDO_MINIMO) return alert("Pedido mínimo "+PEDIDO_MINIMO+"€");
 
-        function openModal(nombre) {
-            const p = PRODUCTOS.find(prod => prod.nombre === nombre);
-            seleccionActual = {};
-            document.getElementById('modal-p-nombre').innerText = p.nombre;
-            document.getElementById('modal-p-img').src = p.img;
-            document.getElementById('modal-p-desc').innerText = p.desc;
-            document.getElementById('modal-p-precio').innerText = p.precio.toFixed(2) + "€";
-            const cont = document.getElementById('variantes-container');
-            cont.innerHTML = "";
-            ['Talla', 'Color', 'Material', 'Sabor', 'Modelo', 'Tipo'].forEach(key => {
-                if(p[key]) {
-                    const opciones = p[key].split(',').map(o => o.trim());
-                    cont.innerHTML += `<label class="text-[10px] font-bold text-gray-400 block mb-2 uppercase">${key === 'Color' ? 'Punto de Carne' : key}</label>
-                        <div class="flex gap-2 flex-wrap" id="g-${key}">${opciones.map(o => `<button onclick="sel(this, '${key}', '${o}')" class="border-2 px-4 py-2 rounded-xl text-xs font-bold">${o}</button>`).join('')}</div>`;
-                }
-            });
-            document.getElementById('add-from-modal').onclick = () => { addToCart(p.nombre, p.precio, {...seleccionActual}); closeProductModal(); };
-            document.getElementById('product-modal').classList.remove('hidden');
-        }
+  const msg=`Pedido:%0A${lista}%0ATotal: ${total.toFixed(2)}€`;
+  window.open(`https://wa.me/${WHATSAPP}?text=${msg}`);
+}
 
-        function sel(btn, k, v) {
-            document.querySelectorAll(`#g-${k} button`).forEach(b => b.classList.remove('bg-black', 'text-white', 'border-black'));
-            btn.classList.add('bg-black', 'text-white', 'border-black');
-            seleccionActual[k] = v;
-        }
+</script>
 
-        function addToCart(n, p, o) { carrito.push({ n, p, o }); updateCart(); }
+<header class="bg-white p-4 font-black text-center">DEMO PEDIDOS</header>
 
-        function updateCart() {
-            document.getElementById('cart-count').innerText = carrito.length;
-            let subtotal = 0;
-            document.getElementById('cart-items').innerHTML = carrito.map(p => {
-                subtotal += p.p;
-                return `<div class="bg-gray-50 p-3 rounded-2xl text-xs font-bold flex justify-between">
-                    <span>${p.n} <br><small class="text-gray-400">${Object.values(p.o).join(' / ')}</small></span>
-                    <span>${p.p.toFixed(2)}€</span>
-                </div>`;
-            }).join('');
-            document.getElementById('total-val').innerText = subtotal.toFixed(2) + "€";
-        }
+<div class="flex gap-2 p-3">
+<button onclick="catActual='Hamburguesas';renderProductos()">Hamburguesas</button>
+<button onclick="catActual='Entrantes';renderProductos()">Entrantes</button>
+</div>
 
-        function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
-        function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); }
+<main id="grid" class="grid grid-cols-2 gap-4 p-4"></main>
 
-        function enviarPedido() {
-            const nombre = document.getElementById('cust-name').value;
-            const tlf = document.getElementById('cust-phone').value; // RECOGER TELÉFONO
-            const addr = document.getElementById('cust-address').value;
-            const modo = document.getElementById('entrega-modo').value;
-            const pago = document.getElementById('pago-metodo').value;
-            const hora = document.getElementById('entrega-tipo').value === 'Programar' ? document.getElementById('entrega-hora').value : "Lo antes posible";
-            
-            if(!nombre || !tlf || !addr || carrito.length === 0) return alert("Completa tus datos."); // VALIDAR TELÉFONO
+<section class="fixed bottom-0 w-full bg-white p-4 border-t">
+<div id="carrito" class="space-y-2"></div>
+<p class="font-black mt-2">Total: <span id="total">0€</span></p>
 
-            let lista = ""; let sub = 0;
-            carrito.forEach(p => { lista += `• ${p.n} [${Object.values(p.o).join(' / ')}] (${p.p.toFixed(2)}€)%0A`; sub += p.p; });
+<select id="modo" class="w-full p-2 mt-2">
+<option>Domicilio</option>
+<option>Recoger</option>
+</select>
 
-            // MENSAJE DE WHATSAPP CON TELÉFONO INCLUIDO
-            const msj = `*📦 NUEVO PEDIDO BURGER*%0A👤 *CLIENTE:* ${nombre}%0A📞 *TELÉFONO:* ${tlf}%0A📍 *LUGAR:* ${addr}%0A🚚 *TIPO:* ${modo}%0A⏰ *HORA:* ${hora}%0A💳 *PAGO:* ${pago}%0A------------------%0A🛍️ *PEDIDO:*%0A${lista}%0A📝 *NOTAS:* ${document.getElementById('cust-notes').value || 'Ninguna'}%0A💰 *TOTAL: ${sub.toFixed(2)}€*%0A------------------%0A🔄 _Confirme recepción para empezar a cocinar._`;
-            window.open(`https://wa.me/${WHATSAPP_RESTAURANTE}?text=${msj}`, '_blank');
-        }
+<input id="nombre" placeholder="Nombre" class="w-full p-2 mt-2">
+<input id="tel" placeholder="Teléfono" class="w-full p-2 mt-2">
+<input id="dir" placeholder="Dirección" class="w-full p-2 mt-2">
 
-        for(let h=19; h<=23; h++) for(let m=0; m<60; m+=15) document.getElementById('entrega-hora').innerHTML += `<option value="${h}:${m==0?'00':m}">A las ${h}:${m==0?'00':m}</option>`;
-        filterCat('Hamburguesas');
-    </script>
+<button onclick="enviar()" class="btn w-full p-4 mt-3 font-black">
+HACER PEDIDO
+</button>
+</section>
+
+<div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-end">
+<div class="bg-white w-full p-6 rounded-t-3xl">
+<h3 id="m-nombre" class="font-black text-xl"></h3>
+<img id="m-img" class="rounded-2xl my-3">
+<p id="m-desc"></p>
+<div id="m-var" class="space-y-4 mt-4"></div>
+<div class="flex justify-between mt-4">
+<span id="m-precio" class="font-black"></span>
+<button id="add" class="btn px-6 py-3 rounded-xl">Añadir</button>
+</div>
+</div>
+</div>
+
+<script>renderProductos()</script>
 </body>
 </html>
