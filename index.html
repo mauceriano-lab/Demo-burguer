@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger Master | Carta Digital Pro</title>
+    <title>Burger Master | Demo Profesional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -90,17 +90,18 @@
             { cat: "Hamburguesas", nombre: "Bacon Cheese", precio: 12.50, desc: "Mucho bacon crujiente y doble cheddar fundido.", img: "https://images.unsplash.com/photo-1553979459-d2229ba7143b?w=500", Color: "Al punto, Muy hecha" },
             { cat: "Hamburguesas", nombre: "Trufa & Setas", precio: 14.90, desc: "Crema de trufa negra y mix de setas salteadas.", img: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=500", Color: "Al punto, Muy hecha" },
             { cat: "Hamburguesas", nombre: "La Picante", precio: 11.90, desc: "Jalapeños, salsa brava y queso pepper jack.", img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500", Color: "Al punto, Muy hecha" },
-            { cat: "Hamburguesas", nombre: "Pollo Crispy", precio: 10.00, desc: "Pollo super crujiente y col slow.", img: "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=500" },
-            { cat: "Hamburguesas", nombre: "Vegan Burger", precio: 11.00, desc: "Carne vegetal Beyond Meat.", img: "https://images.unsplash.com/photo-1512152272829-e3139592d56f?w=500" },
+            { cat: "Hamburguesas", nombre: "Pollo Crispy", precio: 10.00, desc: "Contramuslo de pollo super crujiente y col slow.", img: "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=500" },
+            { cat: "Hamburguesas", nombre: "Vegan Burger", precio: 11.00, desc: "Carne vegetal Beyond Meat y queso vegano.", img: "https://images.unsplash.com/photo-1512152272829-e3139592d56f?w=500" },
             { cat: "Entrantes", nombre: "Patatas Fritas", precio: 4.50, desc: "Corte grueso casero.", img: "https://images.unsplash.com/photo-1573015084185-7205ba3d6f2e?w=500", Sabor: "Ketchup, Mayonesa" },
             { cat: "Entrantes", nombre: "Nachos Supreme", precio: 9.00, desc: "Guacamole y chili.", img: "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=500" },
-            { cat: "Entrantes", nombre: "Aros de Cebolla", precio: 5.50, desc: "8 unidades con BBQ.", img: "https://images.unsplash.com/photo-1639024471283-03518883512d?w=500" },
+            { cat: "Entrantes", nombre: "Aros de Cebolla", precio: 5.50, desc: "8 unidades.", img: "https://images.unsplash.com/photo-1639024471283-03518883512d?w=500" },
             { cat: "Entrantes", nombre: "Nuggets Pollo", precio: 6.00, desc: "6 unidades.", img: "https://images.unsplash.com/photo-1562967914-608f82629710?w=500" },
             { cat: "Entrantes", nombre: "Tequeños Queso", precio: 7.50, desc: "5 palitos.", img: "https://images.unsplash.com/photo-1541529086526-db283c563270?w=500" },
             { cat: "Entrantes", nombre: "Ensalada Col", precio: 4.00, desc: "Clásica.", img: "https://images.unsplash.com/photo-1625944525533-473f1a3d54e7?w=500" },
             { cat: "Bebidas", nombre: "Refrescos", precio: 2.50, desc: "Lata 33cl.", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500", Modelo: "Coca-Cola, Zero, Fanta" },
             { cat: "Bebidas", nombre: "Cerveza", precio: 3.00, desc: "Tercio frío.", img: "https://images.unsplash.com/photo-1550341914-8784ce899580?w=500" },
-            { cat: "Postres", nombre: "Brownie", precio: 5.50, desc: "Con helado.", img: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500" }
+            { cat: "Postres", nombre: "Brownie Chocolate", precio: 5.50, desc: "Con helado.", img: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500" },
+            { cat: "Postres", nombre: "Tarta Queso", precio: 6.00, desc: "Horneada.", img: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=500" }
         ];
 
         let carrito = [];
@@ -173,19 +174,17 @@
             const pago = document.getElementById('pago-metodo').value;
             const hora = document.getElementById('entrega-tipo').value === 'Programar' ? document.getElementById('entrega-hora').value : "Lo antes posible";
             
-            if(!nombre || !addr || carrito.length === 0) return alert("Completa tus datos.");
+            if(!nombre || !addr || carrito.length === 0) return alert("Faltan datos.");
 
-            const ahora = new Date();
-            const hRecogida = new Date(ahora.getTime() + 30 * 60000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const hRecogida = new Date(Date.now() + 30*60000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 
             let lista = ""; let sub = 0;
             carrito.forEach(p => { lista += `• ${p.n} [${Object.values(p.o).join('/')}] (${p.p.toFixed(2)}€)%0A`; sub += p.p; });
 
-            // TICKET REPARTIDOR (Limpio)
-            const txtRepartidor = `*🚲 ENCARGO DE REPARTO*%0A------------------%0A🕒 *RECOGER A LAS:* ${hRecogida}%0A📍 *ENTREGA:* ${addr}%0A🗺️ *MAPS:* https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}%0A💳 *PAGO:* ${pago}%0A💰 *COBRAR:* ${sub.toFixed(2)}€%0A👤 *CLIENTE:* ${nombre}`;
+            // BLOQUE PARA EL REPARTIDOR (Para que el restaurante copie y pegue)
+            const txtRepartidor = `%0A%0A------------------%0A🚲 *COPIAR PARA REPARTIDOR:*%0A------------------%0A🕒 *RECOGER:* ${hRecogida}%0A📍 *ENTREGA:* ${addr}%0A🗺️ *MAPS:* http://maps.google.com/?q=${encodeURIComponent(addr)}%0A💳 *PAGO:* ${pago}%0A💰 *COBRAR:* ${sub.toFixed(2)}€%0A👤 *CLIENTE:* ${nombre}`;
 
-            // TICKET RESTAURANTE
-            const msjRestaurante = `*📦 NUEVO PEDIDO*%0A👤 *CLIENTE:* ${nombre}%0A📍 *LUGAR:* ${addr}%0A🚚 *TIPO:* ${modo}%0A⏰ *HORA:* ${hora}%0A💳 *PAGO:* ${pago}%0A------------------%0A🛍️ *PEDIDO:*%0A${lista}%0A📝 *NOTAS:* ${document.getElementById('cust-notes').value || 'Ninguna'}%0A💰 *TOTAL: ${sub.toFixed(2)}€*%0A------------------%0A👉 *REENVIAR A REPARTIDOR:*%0Ahttps://wa.me/?text=${encodeURIComponent(txtRepartidor)}`;
+            const msjRestaurante = `*📦 NUEVO PEDIDO*%0A👤 *CLIENTE:* ${nombre}%0A📍 *DIRECCIÓN:* ${addr}%0A🚚 *TIPO:* ${modo}%0A⏰ *HORA:* ${hora}%0A💳 *PAGO:* ${pago}%0A------------------%0A🛍️ *PEDIDO:*%0A${lista}%0A📝 *NOTAS:* ${document.getElementById('cust-notes').value || 'Ninguna'}%0A💰 *TOTAL: ${sub.toFixed(2)}€*${txtRepartidor}`;
 
             window.open(`https://wa.me/${WHATSAPP_RESTAURANTE}?text=${msjRestaurante}`, '_blank');
         }
