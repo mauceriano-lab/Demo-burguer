@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tienda WhatsApp | Demo Profesional</title>
+  <title>Tienda Demo | Pedido por WhatsApp</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -17,12 +17,10 @@
 </head>
 
 <body class="pb-20">
+
 <header class="bg-white sticky top-0 z-40 border-b shadow-sm">
   <div class="max-w-md mx-auto px-5 py-4 flex justify-between items-center">
-    <div class="leading-tight">
-      <h1 class="text-xl font-black italic tracking-tighter uppercase">TIENDA DEMO 🛍️</h1>
-      <p class="text-[11px] text-gray-500 font-semibold -mt-0.5">Pedido por WhatsApp · sin pagos integrados</p>
-    </div>
+    <h1 class="text-xl font-black italic tracking-tighter uppercase">TIENDA DEMO 🛍️</h1>
     <button onclick="toggleCart()" class="relative p-2 bg-gray-100 rounded-full">
       <i class="fa-solid fa-shopping-bag text-xl"></i>
       <span id="cart-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
@@ -37,23 +35,14 @@
   </div>
 </header>
 
-<main class="max-w-md mx-auto px-5 py-4">
-  <div class="mb-4 flex gap-2">
-    <div class="flex-1 relative">
-      <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-      <input id="search" oninput="applySearch()" placeholder="Buscar (ej. 'algodón', 'vainilla', 'negro')"
-             class="w-full pl-9 pr-3 py-3 bg-white border rounded-2xl text-sm font-semibold shadow-sm">
-    </div>
-    <button onclick="clearSearch()" class="px-4 py-3 bg-gray-100 border rounded-2xl text-sm font-black">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
+<main class="max-w-md mx-auto px-5 py-6">
+  <div class="mb-4 relative">
+    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+    <input id="search" oninput="applySearch()" placeholder="Buscar productos..."
+           class="w-full pl-9 pr-3 py-3 bg-white border rounded-2xl text-sm font-semibold shadow-sm">
   </div>
 
   <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
-
-  <p class="text-[11px] text-gray-500 font-semibold mt-5">
-    Tip: en producción cambias las imágenes por tus URLs o por <span class="font-black">/img/foto.jpg</span>.
-  </p>
 </main>
 
 <!-- Product modal -->
@@ -70,9 +59,7 @@
 
     <div class="flex items-center justify-between gap-4 sticky bottom-0 bg-white pt-3 border-t">
       <span id="modal-p-precio" class="text-2xl font-black"></span>
-      <button id="add-from-modal" class="flex-grow btn-principal py-4 rounded-2xl font-bold uppercase text-xs tracking-widest">
-        Añadir
-      </button>
+      <button id="add-from-modal" class="flex-grow btn-principal py-4 rounded-2xl font-bold uppercase text-xs tracking-widest">Añadir</button>
     </div>
   </div>
 </div>
@@ -87,64 +74,29 @@
 
     <div id="cart-items" class="space-y-3 mb-6"></div>
 
+    <!-- SOLO datos del cliente -->
     <div class="space-y-4 border-t pt-4">
-      <div class="flex gap-2">
-        <button onclick="vaciarCarrito()" class="w-full py-3 rounded-2xl font-black text-xs uppercase border bg-gray-50">
-          Vaciar carrito
-        </button>
-        <button onclick="toggleCart()" class="w-full py-3 rounded-2xl font-black text-xs uppercase border bg-white">
-          Seguir comprando
-        </button>
-      </div>
-
-      <div>
-        <label class="text-[10px] font-bold uppercase text-gray-400">Tipo de Entrega</label>
-        <select id="entrega-modo" onchange="onEntregaModoChange()" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm mt-1">
-          <option value="Domicilio">A Domicilio 🏠</option>
-          <option value="Recoger">Para Recoger 🥡</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="text-[10px] font-bold uppercase text-gray-400">¿Para cuándo?</label>
-        <select id="entrega-tipo" onchange="document.getElementById('entrega-hora').classList.toggle('hidden', this.value !== 'Programar'); saveForm()" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm mt-1">
-          <option value="Lo antes posible">Lo antes posible ⚡</option>
-          <option value="Programar">Seleccionar hora ⏰</option>
-        </select>
-        <select id="entrega-hora" onchange="saveForm()" class="hidden w-full p-3 mt-2 bg-gray-50 border rounded-xl font-bold text-sm text-blue-600"></select>
-      </div>
-
-      <div>
-        <label class="text-[10px] font-bold uppercase text-gray-400">Método de Pago</label>
-        <select id="pago-metodo" onchange="saveForm()" class="w-full p-3 bg-gray-50 border rounded-xl font-bold text-sm mt-1">
-          <option value="Efectivo">Efectivo 💵</option>
-          <option value="Tarjeta">Tarjeta (Datafono) 💳</option>
-          <option value="Transferencia">Transferencia 🏦</option>
-        </select>
-      </div>
-
-      <textarea id="cust-notes" oninput="saveForm()" placeholder="Notas (talla, color, referencias, alergias...)" class="w-full p-3 bg-gray-50 border rounded-xl text-sm h-16"></textarea>
-      <input type="text" id="cust-name" oninput="saveForm()" placeholder="Tu Nombre" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
-      <input type="tel" id="cust-phone" oninput="saveForm()" placeholder="Tu Teléfono" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
-
-      <div id="address-wrap">
-        <input type="text" id="cust-address" oninput="saveForm()" placeholder="Dirección completa" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
-        <p class="text-[11px] text-gray-500 font-semibold mt-2">
-          Si eliges <span class="font-black">“Para Recoger”</span>, la dirección no es obligatoria.
-        </p>
-      </div>
+      <textarea id="cust-notes" placeholder="Notas (talla, color, alergias...)" class="w-full p-3 bg-gray-50 border rounded-xl text-sm h-16" oninput="saveState()"></textarea>
+      <input type="text" id="cust-name" placeholder="Tu Nombre" class="w-full p-3 bg-gray-50 border rounded-xl text-sm" oninput="saveState()">
+      <input type="tel" id="cust-phone" placeholder="Tu Teléfono" class="w-full p-3 bg-gray-50 border rounded-xl text-sm" oninput="saveState()">
+      <input type="text" id="cust-address" placeholder="Dirección completa" class="w-full p-3 bg-gray-50 border rounded-xl text-sm" oninput="saveState()">
 
       <div class="flex justify-between text-2xl font-black pt-2">
         <span>TOTAL:</span>
         <span id="total-val">0.00€</span>
       </div>
 
-      <button onclick="enviarPedido()" class="w-full btn-principal py-5 rounded-2xl font-black text-sm uppercase flex items-center justify-center gap-3 mb-10">
-        <i class="fa-brands fa-whatsapp text-2xl"></i> HACER PEDIDO
-      </button>
+      <div class="flex gap-2">
+        <button onclick="vaciarCarrito()" class="w-full py-4 rounded-2xl font-black text-xs uppercase border bg-gray-50">
+          Vaciar
+        </button>
+        <button onclick="enviarPedido()" class="w-full btn-principal py-4 rounded-2xl font-black text-xs uppercase flex items-center justify-center gap-2">
+          <i class="fa-brands fa-whatsapp text-xl"></i> Enviar pedido
+        </button>
+      </div>
 
-      <p class="text-[11px] text-gray-500 font-semibold -mt-6">
-        No se guarda el pedido en servidor: se envía por WhatsApp y el vendedor te manda el enlace de pago.
+      <p class="text-[11px] text-gray-500 font-semibold mt-1">
+        El pedido se envía por WhatsApp y el vendedor te comparte el enlace de pago.
       </p>
     </div>
   </div>
@@ -152,79 +104,96 @@
 
 <script>
   /** CONFIG */
-  const WHATSAPP_VENDEDOR = "34633817413"; // +34 633 817 413 -> wa.me sin "+"
+  const WHATSAPP_VENDEDOR = "34633817413"; // +34 633 817 413 (wa.me sin "+")
   const MONEDA = "€";
+  const LS_KEY = "demo_store_clean_v1";
 
-  /** DEMO DATA (4 categorías, 6+ productos cada una) */
+  /** PRODUCTOS (4 categorías, 6 c/u) */
   const PRODUCTOS = [
-    // ROPA (6)
-    { cat:"Ropa", nombre:"Playera Básica Algodón", precio:12.90, desc:"Algodón suave, corte unisex. Ideal para diario.", img:"https://images.unsplash.com/photo-1520975661595-6453be3f7070?w=700", Talla:"S, M, L, XL", Color:"Negro, Blanco, Gris" },
-    { cat:"Ropa", nombre:"Sudadera Oversize", precio:29.90, desc:"Interior afelpado, look urbano.", img:"https://images.unsplash.com/photo-1520975958225-ff7f128a02e9?w=700", Talla:"S, M, L, XL", Color:"Negro, Arena" },
-    { cat:"Ropa", nombre:"Gorra Bordada", precio:14.50, desc:"Ajustable, bordado frontal.", img:"https://images.unsplash.com/photo-1520975687960-5f5b89a1cdd6?w=700", Color:"Negro, Beige, Azul" },
-    { cat:"Ropa", nombre:"Calcetas Deportivas (Pack x3)", precio:9.90, desc:"Transpirables, soporte en arco.", img:"https://images.unsplash.com/photo-1582738412142-75b1a36c5c2d?w=700", Talla:"CH, M, G" },
-    { cat:"Ropa", nombre:"Tote Bag Resistente", precio:11.00, desc:"Lona gruesa, ideal para mandado o escuela.", img:"https://images.unsplash.com/photo-1520975680963-9b3cbb6f0a77?w=700", Color:"Natural, Negro" },
-    { cat:"Ropa", nombre:"Rompevientos Ligero", precio:34.90, desc:"Ligero y cómodo, para clima variable.", img:"https://images.unsplash.com/photo-1520975749810-05e25f4c7d11?w=700", Talla:"S, M, L, XL" },
+    // Ropa (6)
+    { id:"ropa-1", cat:"Ropa", nombre:"Playera Básica Algodón", precio:12.90, desc:"Algodón suave, corte unisex. Ideal para diario.", img:"https://images.unsplash.com/photo-1520975661595-6453be3f7070?w=500", Talla:"S, M, L, XL", Color:"Negro, Blanco, Gris" },
+    { id:"ropa-2", cat:"Ropa", nombre:"Sudadera Oversize", precio:29.90, desc:"Interior afelpado, estilo urbano.", img:"https://images.unsplash.com/photo-1520975958225-ff7f128a02e9?w=500", Talla:"S, M, L, XL", Color:"Negro, Arena" },
+    { id:"ropa-3", cat:"Ropa", nombre:"Gorra Bordada", precio:14.50, desc:"Ajustable, bordado frontal.", img:"https://images.unsplash.com/photo-1520975687960-5f5b89a1cdd6?w=500", Color:"Negro, Beige, Azul" },
+    { id:"ropa-4", cat:"Ropa", nombre:"Calcetas Deportivas (Pack x3)", precio:9.90, desc:"Transpirables, soporte en arco.", img:"https://images.unsplash.com/photo-1582738412142-75b1a36c5c2d?w=500", Talla:"CH, M, G" },
+    { id:"ropa-5", cat:"Ropa", nombre:"Tote Bag Resistente", precio:11.00, desc:"Lona gruesa, ideal para mandado.", img:"https://images.unsplash.com/photo-1520975680963-9b3cbb6f0a77?w=500", Color:"Natural, Negro" },
+    { id:"ropa-6", cat:"Ropa", nombre:"Rompevientos Ligero", precio:34.90, desc:"Ligero y cómodo, para clima variable.", img:"https://images.unsplash.com/photo-1520975749810-05e25f4c7d11?w=500", Talla:"S, M, L, XL" },
 
-    // BELLEZA (6)
-    { cat:"Belleza", nombre:"Kit Skincare (Mini)", precio:18.00, desc:"Rutina básica: limpieza + hidratación (tamaño viaje).", img:"https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=700", Tipo:"Piel seca, Piel mixta, Piel grasa" },
-    { cat:"Belleza", nombre:"Bálsamo Labial", precio:4.50, desc:"Hidratación diaria, aroma suave.", img:"https://images.unsplash.com/photo-1612810436541-336d7c0f7fd6?w=700", Sabor:"Vainilla, Menta, Coco" },
-    { cat:"Belleza", nombre:"Perfume Roll-on 10ml", precio:9.90, desc:"Fragancia práctica para bolsa.", img:"https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=700", Modelo:"Dulce, Fresco, Amaderado" },
-    { cat:"Belleza", nombre:"Crema de Manos", precio:6.90, desc:"Rápida absorción, no grasosa.", img:"https://images.unsplash.com/photo-1585232351009-aa87416fca90?w=700", Sabor:"Karité, Almendra" },
-    { cat:"Belleza", nombre:"Jabón Artesanal", precio:5.20, desc:"Hecho a mano. Suave con la piel.", img:"https://images.unsplash.com/photo-1607006344380-b6775a0824ce?w=700", Tipo:"Avena, Lavanda, Carbón" },
-    { cat:"Belleza", nombre:"Serum Vitamina C", precio:16.90, desc:"Ilumina y unifica (uso diario).", img:"https://images.unsplash.com/photo-1611930022073-84fbbd9f19b1?w=700", Tipo:"Suave, Concentrado" },
+    // Belleza (6)
+    { id:"bel-1", cat:"Belleza", nombre:"Bálsamo Labial", precio:4.50, desc:"Hidratación diaria, aroma suave.", img:"https://images.unsplash.com/photo-1612810436541-336d7c0f7fd6?w=500", Sabor:"Vainilla, Menta, Coco" },
+    { id:"bel-2", cat:"Belleza", nombre:"Crema de Manos", precio:6.90, desc:"Rápida absorción, no grasosa.", img:"https://images.unsplash.com/photo-1585232351009-aa87416fca90?w=500", Sabor:"Karité, Almendra" },
+    { id:"bel-3", cat:"Belleza", nombre:"Jabón Artesanal", precio:5.20, desc:"Hecho a mano. Suave con la piel.", img:"https://images.unsplash.com/photo-1607006344380-b6775a0824ce?w=500", Tipo:"Avena, Lavanda, Carbón" },
+    { id:"bel-4", cat:"Belleza", nombre:"Perfume Roll-on 10ml", precio:9.90, desc:"Fragancia práctica para bolsa.", img:"https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=500", Modelo:"Dulce, Fresco, Amaderado" },
+    { id:"bel-5", cat:"Belleza", nombre:"Serum Vitamina C", precio:16.90, desc:"Ilumina y unifica (uso diario).", img:"https://images.unsplash.com/photo-1611930022073-84fbbd9f19b1?w=500", Tipo:"Suave, Concentrado" },
+    { id:"bel-6", cat:"Belleza", nombre:"Kit Skincare (Mini)", precio:18.00, desc:"Limpieza + hidratación (tamaño viaje).", img:"https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=500", Tipo:"Piel seca, Piel mixta, Piel grasa" },
 
-    // HOGAR (6)
-    { cat:"Hogar", nombre:"Vela Aromática", precio:11.50, desc:"Aroma cálido, envase de vidrio.", img:"https://images.unsplash.com/photo-1602874801007-8a3b3d5f13d8?w=700", Sabor:"Vainilla, Canela, Lavanda" },
-    { cat:"Hogar", nombre:"Difusor de Varillas", precio:15.90, desc:"Aroma constante en tu espacio.", img:"https://images.unsplash.com/photo-1602874801085-21c95b6f7b67?w=700", Sabor:"Cítrico, Floral" },
-    { cat:"Hogar", nombre:"Taza Cerámica 330ml", precio:8.20, desc:"Apta para microondas. Minimalista.", img:"https://images.unsplash.com/photo-1517705008128-361805f42e86?w=700", Color:"Blanco, Negro" },
-    { cat:"Hogar", nombre:"Botella Térmica 500ml", precio:19.90, desc:"Acero inoxidable. Frío/calor.", img:"https://images.unsplash.com/photo-1526401485004-2aa7c9f53c62?w=700", Color:"Negro, Plateado" },
-    { cat:"Hogar", nombre:"Organizador de Escritorio", precio:12.90, desc:"Ordena cables, notas y accesorios.", img:"https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=700", Material:"Madera, Metal" },
-    { cat:"Hogar", nombre:"Set Toallas (2 piezas)", precio:21.00, desc:"Suaves y absorbentes.", img:"https://images.unsplash.com/photo-1582582621959-48d27397dc5c?w=700", Color:"Blanco, Gris" },
+    // Hogar (6)
+    { id:"hog-1", cat:"Hogar", nombre:"Vela Aromática", precio:11.50, desc:"Aroma cálido, envase de vidrio.", img:"https://images.unsplash.com/photo-1602874801007-8a3b3d5f13d8?w=500", Sabor:"Vainilla, Canela, Lavanda" },
+    { id:"hog-2", cat:"Hogar", nombre:"Difusor de Varillas", precio:15.90, desc:"Aroma constante en tu espacio.", img:"https://images.unsplash.com/photo-1602874801085-21c95b6f7b67?w=500", Sabor:"Cítrico, Floral" },
+    { id:"hog-3", cat:"Hogar", nombre:"Taza Cerámica 330ml", precio:8.20, desc:"Apta microondas. Minimalista.", img:"https://images.unsplash.com/photo-1517705008128-361805f42e86?w=500", Color:"Blanco, Negro" },
+    { id:"hog-4", cat:"Hogar", nombre:"Botella Térmica 500ml", precio:19.90, desc:"Acero inoxidable. Frío/calor.", img:"https://images.unsplash.com/photo-1526401485004-2aa7c9f53c62?w=500", Color:"Negro, Plateado" },
+    { id:"hog-5", cat:"Hogar", nombre:"Organizador Escritorio", precio:12.90, desc:"Ordena cables, notas y accesorios.", img:"https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=500", Material:"Madera, Metal" },
+    { id:"hog-6", cat:"Hogar", nombre:"Set Toallas (2 piezas)", precio:21.00, desc:"Suaves y absorbentes.", img:"https://images.unsplash.com/photo-1582582621959-48d27397dc5c?w=500", Color:"Blanco, Gris" },
 
-    // ACCESORIOS (6)
-    { cat:"Accesorios", nombre:"Cargador USB-C 20W", precio:14.90, desc:"Carga rápida compatible.", img:"https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=700", Modelo:"EU, US" },
-    { cat:"Accesorios", nombre:"Cable Trenzado 1.5m", precio:7.90, desc:"Resistente, ideal para uso diario.", img:"https://images.unsplash.com/photo-1583863788435-4a8f8d6b7a6b?w=700", Tipo:"USB-C, Lightning" },
-    { cat:"Accesorios", nombre:"Audífonos In-ear", precio:18.90, desc:"Buen audio para llamadas y música.", img:"https://images.unsplash.com/photo-1585386959984-a41552231693?w=700", Color:"Negro, Blanco" },
-    { cat:"Accesorios", nombre:"Soporte de Celular", precio:9.50, desc:"Para escritorio o cocina. Ajustable.", img:"https://images.unsplash.com/photo-1512499617640-c2f999fe2a5d?w=700", Tipo:"Metal, Plástico" },
-    { cat:"Accesorios", nombre:"Power Bank 10,000mAh", precio:24.90, desc:"Compacta, carga dos dispositivos.", img:"https://images.unsplash.com/photo-1602524205579-8a3f997e98c3?w=700", Modelo:"Negro, Azul" },
-    { cat:"Accesorios", nombre:"Llavero Minimal", precio:4.20, desc:"Ligero y elegante.", img:"https://images.unsplash.com/photo-1520975681324-3b8f9e8b8d50?w=700", Material:"Acero, Cuero" },
+    // Accesorios (6)
+    { id:"acc-1", cat:"Accesorios", nombre:"Cargador USB-C 20W", precio:14.90, desc:"Carga rápida compatible.", img:"https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=500", Modelo:"EU, US" },
+    { id:"acc-2", cat:"Accesorios", nombre:"Cable Trenzado 1.5m", precio:7.90, desc:"Resistente, ideal uso diario.", img:"https://images.unsplash.com/photo-1583863788435-4a8f8d6b7a6b?w=500", Tipo:"USB-C, Lightning" },
+    { id:"acc-3", cat:"Accesorios", nombre:"Audífonos In-ear", precio:18.90, desc:"Buen audio para llamadas y música.", img:"https://images.unsplash.com/photo-1585386959984-a41552231693?w=500", Color:"Negro, Blanco" },
+    { id:"acc-4", cat:"Accesorios", nombre:"Soporte de Celular", precio:9.50, desc:"Para escritorio o cocina. Ajustable.", img:"https://images.unsplash.com/photo-1512499617640-c2f999fe2a5d?w=500", Tipo:"Metal, Plástico" },
+    { id:"acc-5", cat:"Accesorios", nombre:"Power Bank 10,000mAh", precio:24.90, desc:"Compacta, carga dos dispositivos.", img:"https://images.unsplash.com/photo-1602524205579-8a3f997e98c3?w=500", Modelo:"Negro, Azul" },
+    { id:"acc-6", cat:"Accesorios", nombre:"Llavero Minimal", precio:4.20, desc:"Ligero y elegante.", img:"https://images.unsplash.com/photo-1520975681324-3b8f9e8b8d50?w=500", Material:"Acero, Cuero" },
   ];
 
-  /** STATE (carrito con cantidades) */
-  const LS_KEY = "wa_demo_store_v2";
-  let carrito = []; // [{n,p,o,qty}]
-  let seleccionActual = {};
+  /** STATE */
+  let carrito = [];         // [{k,id,n,p,o,qty}]
+  let seleccionActual = {}; // variantes del modal
   let categoriaActual = "Ropa";
   let busqueda = "";
+  let pickQty = {};         // cantidad elegida por tarjeta: { [id]: number }
 
-  /** INIT */
-  loadAll();
-  buildHoras();
-  filterCat(categoriaActual);
-
-  function loadAll(){
-    try{
-      const saved = JSON.parse(localStorage.getItem(LS_KEY));
-      if(saved?.carrito) carrito = saved.carrito;
-      if(saved?.form) restoreForm(saved.form);
-      if(saved?.ui){
-        categoriaActual = saved.ui.categoria || categoriaActual;
-        busqueda = saved.ui.busqueda || "";
-        document.getElementById("search").value = busqueda;
-      }
-    }catch(e){}
-    updateCart();
+  /** Utils */
+  function money(x){ return x.toFixed(2) + MONEDA; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function escapeAttr(s){ return escapeHtml(s).replace(/`/g,'&#96;'); }
+  function keyOf(id, o){
+    const opts = Object.entries(o||{}).sort(([a],[b]) => a.localeCompare(b));
+    return id + "||" + JSON.stringify(opts);
   }
-  function saveAll(){
+
+  /** Persistence */
+  function saveState(){
     const payload = {
       carrito,
-      form: readForm(),
-      ui: { categoria: categoriaActual, busqueda }
+      ui: { categoriaActual, busqueda, pickQty },
+      form: {
+        notes: document.getElementById('cust-notes').value,
+        name: document.getElementById('cust-name').value,
+        phone: document.getElementById('cust-phone').value,
+        address: document.getElementById('cust-address').value
+      }
     };
     localStorage.setItem(LS_KEY, JSON.stringify(payload));
   }
 
-  /** UI: categorías + búsqueda */
+  function loadState(){
+    try{
+      const s = JSON.parse(localStorage.getItem(LS_KEY));
+      if(s?.carrito) carrito = s.carrito;
+      if(s?.ui){
+        categoriaActual = s.ui.categoriaActual || categoriaActual;
+        busqueda = s.ui.busqueda || "";
+        pickQty = s.ui.pickQty || {};
+        document.getElementById("search").value = busqueda;
+      }
+      if(s?.form){
+        document.getElementById('cust-notes').value = s.form.notes || "";
+        document.getElementById('cust-name').value = s.form.name || "";
+        document.getElementById('cust-phone').value = s.form.phone || "";
+        document.getElementById('cust-address').value = s.form.address || "";
+      }
+    }catch(e){}
+  }
+
+  /** Category */
   function setActiveCatBtn(cat){
     document.querySelectorAll('.cat-btn').forEach(b => {
       b.classList.remove('bg-black','text-white');
@@ -236,60 +205,82 @@
     });
   }
 
-  function applySearch(){
-    busqueda = (document.getElementById("search").value || "").trim().toLowerCase();
-    saveAll();
-    renderGrid();
-  }
-  function clearSearch(){
-    document.getElementById("search").value = "";
-    busqueda = "";
-    saveAll();
-    renderGrid();
-  }
-
   function filterCat(cat){
     categoriaActual = cat;
     setActiveCatBtn(cat);
-    saveAll();
+    saveState();
     renderGrid();
   }
 
+  function applySearch(){
+    busqueda = (document.getElementById("search").value || "").trim().toLowerCase();
+    saveState();
+    renderGrid();
+  }
+
+  /** Quantity selector in each product card */
+  function getPick(id){ return Math.max(1, Number(pickQty[id] || 1)); }
+  function incPick(id){ pickQty[id] = getPick(id) + 1; saveState(); renderGrid(); }
+  function decPick(id){ pickQty[id] = Math.max(1, getPick(id) - 1); saveState(); renderGrid(); }
+
+  function addFromCard(id){
+    const p = PRODUCTOS.find(x => x.id === id);
+    if(!p) return;
+    const qty = getPick(id);
+    addToCart(p.id, p.nombre, p.precio, {}, qty); // sin variantes desde tarjeta
+  }
+
+  /** Grid */
   function renderGrid(){
     const grid = document.getElementById('product-grid');
     const list = PRODUCTOS
       .filter(p => p.cat === categoriaActual)
       .filter(p => {
         if(!busqueda) return true;
-        const hay = (p.nombre + " " + p.desc + " " + p.cat + " " + JSON.stringify(p)).toLowerCase();
+        const hay = (p.nombre + " " + p.desc + " " + JSON.stringify(p)).toLowerCase();
         return hay.includes(busqueda);
       });
 
-    grid.innerHTML = list.map(p => `
-      <div onclick="openModal('${escapeHtmlAttr(p.nombre)}')" class="bg-white rounded-[2rem] p-3 border border-gray-100 flex flex-col shadow-sm cursor-pointer active:scale-95 transition-all">
-        <img src="${p.img}" class="w-full aspect-square object-cover rounded-[1.5rem] mb-2" onerror="this.src='https://picsum.photos/seed/${encodeURIComponent(p.nombre)}/600/600'">
-        <h3 class="text-xs font-black uppercase tracking-tighter">${escapeHtml(p.nombre)}</h3>
-        <p class="font-bold text-sm mt-1 text-black">${p.precio.toFixed(2)}${MONEDA}</p>
-      </div>
-    `).join('') || `<div class="col-span-2 text-sm font-bold text-gray-500 bg-white border rounded-2xl p-4">No hay resultados con ese filtro.</div>`;
+    grid.innerHTML = list.map(p => {
+      const q = getPick(p.id);
+      return `
+        <div class="bg-white rounded-[2rem] p-3 border border-gray-100 flex flex-col shadow-sm transition-all">
+          <button type="button" onclick="openModal('${escapeAttr(p.id)}')" class="text-left active:scale-[0.99] transition-all">
+            <img src="${p.img}" class="w-full aspect-square object-cover rounded-[1.5rem] mb-2" onerror="this.src='https://picsum.photos/seed/${encodeURIComponent(p.nombre)}/600/600'">
+            <h3 class="text-xs font-black uppercase tracking-tighter">${escapeHtml(p.nombre)}</h3>
+            <p class="font-bold text-sm mt-1 text-black">${money(p.precio)}</p>
+          </button>
+
+          <div class="mt-3 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="decPick('${escapeAttr(p.id)}')" class="px-3 py-2 rounded-xl border bg-white font-black">−</button>
+              <span class="px-3 py-2 rounded-xl border bg-gray-50 font-black min-w-[44px] text-center">${q}</span>
+              <button type="button" onclick="incPick('${escapeAttr(p.id)}')" class="px-3 py-2 rounded-xl border bg-white font-black">+</button>
+            </div>
+            <button type="button" onclick="addFromCard('${escapeAttr(p.id)}')" class="btn-principal px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest">
+              Añadir
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('') || `<div class="col-span-2 text-sm font-bold text-gray-500 bg-white border rounded-2xl p-4">No hay resultados.</div>`;
   }
 
-  /** Product modal + variantes */
-  function openModal(nombre) {
-    const p = PRODUCTOS.find(prod => prod.nombre === nombre);
+  /** Modal */
+  function openModal(id) {
+    const p = PRODUCTOS.find(prod => prod.id === id);
     if(!p) return;
     seleccionActual = {};
 
     document.getElementById('modal-p-nombre').innerText = p.nombre;
     document.getElementById('modal-p-img').src = p.img;
     document.getElementById('modal-p-desc').innerText = p.desc;
-    document.getElementById('modal-p-precio').innerText = p.precio.toFixed(2) + MONEDA;
+    document.getElementById('modal-p-precio').innerText = money(p.precio);
 
     const cont = document.getElementById('variantes-container');
     cont.innerHTML = "";
 
-    const keys = ['Talla', 'Color', 'Material', 'Sabor', 'Modelo', 'Tipo'];
-    keys.forEach(key => {
+    ['Talla', 'Color', 'Material', 'Sabor', 'Modelo', 'Tipo'].forEach(key => {
       if(p[key]) {
         const opciones = String(p[key]).split(',').map(o => o.trim()).filter(Boolean);
         cont.innerHTML += `
@@ -297,7 +288,7 @@
             <label class="text-[10px] font-bold text-gray-400 block mb-2 uppercase">${escapeHtml(key)}</label>
             <div class="flex gap-2 flex-wrap" id="g-${key}">
               ${opciones.map(o => `
-                <button type="button" onclick="sel(this, '${key}', '${escapeHtmlAttr(o)}')" class="border-2 px-4 py-2 rounded-xl text-xs font-bold">
+                <button type="button" onclick="sel(this, '${key}', '${escapeAttr(o)}')" class="border-2 px-4 py-2 rounded-xl text-xs font-bold">
                   ${escapeHtml(o)}
                 </button>
               `).join('')}
@@ -308,7 +299,8 @@
     });
 
     document.getElementById('add-from-modal').onclick = () => {
-      addToCart(p.nombre, p.precio, {...seleccionActual});
+      // Desde modal: añade 1 unidad con variantes
+      addToCart(p.id, p.nombre, p.precio, {...seleccionActual}, 1);
       closeProductModal();
     };
 
@@ -324,27 +316,22 @@
   function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
   function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); }
 
-  /** Carrito con cantidades (mismo producto + mismas opciones = suma qty) */
-  function keyOf(n, o){
-    const opts = Object.entries(o||{}).sort(([a],[b]) => a.localeCompare(b));
-    return n + "||" + JSON.stringify(opts);
-  }
-
-  function addToCart(n, p, o) {
-    const k = keyOf(n,o);
+  /** Cart */
+  function addToCart(id, n, p, o, qty){
+    const k = keyOf(id, o);
     const found = carrito.find(x => x.k === k);
-    if(found) found.qty += 1;
-    else carrito.push({ k, n, p, o, qty: 1 });
-    saveAll();
-    updateCart(true);
+    if(found) found.qty += qty;
+    else carrito.push({ k, id, n, p, o, qty });
+    saveState();
+    updateCart();
   }
 
   function incItem(k){
     const it = carrito.find(x => x.k === k);
     if(!it) return;
     it.qty += 1;
-    saveAll();
-    updateCart(true);
+    saveState();
+    updateCart();
   }
 
   function decItem(k){
@@ -352,177 +339,111 @@
     if(!it) return;
     it.qty -= 1;
     if(it.qty <= 0) carrito = carrito.filter(x => x.k !== k);
-    saveAll();
-    updateCart(true);
+    saveState();
+    updateCart();
   }
 
   function removeItem(k){
     carrito = carrito.filter(x => x.k !== k);
-    saveAll();
-    updateCart(true);
+    saveState();
+    updateCart();
   }
 
   function vaciarCarrito(){
     if(!confirm("¿Vaciar carrito?")) return;
     carrito = [];
-    saveAll();
-    updateCart(true);
+    saveState();
+    updateCart();
   }
 
-  function updateCart(keepOpen=false) {
+  function updateCart() {
     const count = carrito.reduce((s,x)=>s+x.qty,0);
     document.getElementById('cart-count').innerText = count;
 
-    let subtotal = 0;
-    const html = carrito.map(it => {
-      subtotal += it.p * it.qty;
-      const variantes = Object.values(it.o||{}).join(' / ');
+    let total = 0;
+    document.getElementById('cart-items').innerHTML = carrito.map(it => {
+      const variantes = Object.values(it.o||{}).join(' / ') || 'Sin variantes';
+      const lineTotal = it.p * it.qty;
+      total += lineTotal;
+
       return `
         <div class="bg-gray-50 p-3 rounded-2xl text-xs font-bold">
           <div class="flex justify-between gap-3">
             <div>
               <span>${escapeHtml(it.n)}</span><br>
-              <small class="text-gray-400">${escapeHtml(variantes || 'Sin variantes')}</small>
+              <small class="text-gray-400">${escapeHtml(variantes)}</small>
             </div>
             <div class="text-right whitespace-nowrap">
-              <div>${(it.p*it.qty).toFixed(2)}${MONEDA}</div>
-              <div class="text-[10px] text-gray-400 font-black">${it.p.toFixed(2)}${MONEDA} c/u</div>
+              <div>${money(lineTotal)}</div>
+              <div class="text-[10px] text-gray-400 font-black">${money(it.p)} c/u</div>
             </div>
           </div>
 
           <div class="mt-3 flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
-              <button type="button" onclick="decItem('${escapeHtmlAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black">−</button>
+              <button type="button" onclick="decItem('${escapeAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black">−</button>
               <span class="px-3 py-2 rounded-xl border bg-white font-black">${it.qty}</span>
-              <button type="button" onclick="incItem('${escapeHtmlAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black">+</button>
+              <button type="button" onclick="incItem('${escapeAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black">+</button>
             </div>
-            <button type="button" onclick="removeItem('${escapeHtmlAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black text-red-600">
+            <button type="button" onclick="removeItem('${escapeAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black text-red-600">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
         </div>
       `;
-    }).join('');
-
-    document.getElementById('cart-items').innerHTML = html || `
+    }).join('') || `
       <div class="bg-gray-50 p-4 rounded-2xl text-sm font-bold text-gray-500">
         Tu carrito está vacío. Agrega productos para poder enviar el pedido.
       </div>
     `;
 
-    document.getElementById('total-val').innerText = subtotal.toFixed(2) + MONEDA;
-
-    if(keepOpen && document.getElementById('cart-modal').classList.contains('hidden') === false){
-      // already open
-    }
+    document.getElementById('total-val').innerText = money(total);
   }
 
-  /** Form persistence */
-  function readForm(){
-    return {
-      modo: document.getElementById('entrega-modo').value,
-      tipo: document.getElementById('entrega-tipo').value,
-      hora: document.getElementById('entrega-hora').value,
-      pago: document.getElementById('pago-metodo').value,
-      notes: document.getElementById('cust-notes').value,
-      name: document.getElementById('cust-name').value,
-      phone: document.getElementById('cust-phone').value,
-      address: document.getElementById('cust-address').value
-    };
-  }
-  function restoreForm(f){
-    if(!f) return;
-    if(f.modo) document.getElementById('entrega-modo').value = f.modo;
-    if(f.tipo) document.getElementById('entrega-tipo').value = f.tipo;
-    if(f.hora) document.getElementById('entrega-hora').value = f.hora;
-    if(f.pago) document.getElementById('pago-metodo').value = f.pago;
-    if(f.notes) document.getElementById('cust-notes').value = f.notes;
-    if(f.name) document.getElementById('cust-name').value = f.name;
-    if(f.phone) document.getElementById('cust-phone').value = f.phone;
-    if(f.address) document.getElementById('cust-address').value = f.address;
-
-    document.getElementById('entrega-hora').classList.toggle('hidden', document.getElementById('entrega-tipo').value !== 'Programar');
-    onEntregaModoChange(false);
-  }
-  function saveForm(){ saveAll(); }
-
-  function onEntregaModoChange(save=true){
-    const modo = document.getElementById('entrega-modo').value;
-    const wrap = document.getElementById('address-wrap');
-    wrap.classList.toggle('opacity-60', modo === "Recoger");
-    if(save) saveForm();
-  }
-
-  /** WhatsApp */
+  /** WhatsApp (SIN lugar/tipo/hora/pago) */
   function enviarPedido() {
-    const form = readForm();
-    const modo = form.modo;
-    const tipo = form.tipo;
-    const hora = (tipo === 'Programar') ? (form.hora || 'Hora no seleccionada') : 'Lo antes posible';
-    const pago = form.pago;
-
-    const nombre = (form.name || "").trim();
-    const tlf = (form.phone || "").trim();
-    const addr = (form.address || "").trim();
-    const notas = (form.notes || "").trim();
+    const nombre = (document.getElementById('cust-name').value || "").trim();
+    const tlf = (document.getElementById('cust-phone').value || "").trim();
+    const addr = (document.getElementById('cust-address').value || "").trim();
+    const notas = (document.getElementById('cust-notes').value || "").trim();
 
     if(carrito.length === 0) return alert("Tu carrito está vacío.");
     if(!nombre || nombre.length < 2) return alert("Escribe tu nombre.");
     if(!tlf || tlf.length < 6) return alert("Escribe tu teléfono.");
-
-    // Dirección solo obligatoria si es domicilio
-    if(modo === "Domicilio" && (!addr || addr.length < 6)) {
-      return alert("Escribe tu dirección completa (o elige 'Para Recoger').");
-    }
+    if(!addr || addr.length < 6) return alert("Escribe tu dirección completa.");
 
     let lista = "";
-    let sub = 0;
+    let total = 0;
+
     carrito.forEach(it => {
       const variantes = Object.values(it.o||{}).join(' / ') || "Sin variantes";
-      sub += it.p * it.qty;
-      lista += `• ${it.n} x${it.qty} [${variantes}] (${(it.p*it.qty).toFixed(2)}${MONEDA})\n`;
+      const lineTotal = it.p * it.qty;
+      total += lineTotal;
+      lista += `• ${it.n} x${it.qty} [${variantes}] (${money(lineTotal)})\n`;
     });
 
-    const msjPlano =
+    const msg =
 `📦 NUEVO PEDIDO
 👤 CLIENTE: ${nombre}
 📞 TELÉFONO: ${tlf}
-📍 LUGAR: ${modo === "Domicilio" ? addr : "Para recoger (sin dirección)"}
-🚚 TIPO: ${modo}
-⏰ HORA: ${hora}
-💳 PAGO: ${pago}
+📍 DIRECCIÓN: ${addr}
 ------------------
 🛍️ PEDIDO:
 ${lista}
 📝 NOTAS: ${notas || "Ninguna"}
-💰 TOTAL: ${sub.toFixed(2)}${MONEDA}
+💰 TOTAL: ${money(total)}
 ------------------
-🔄 Confirma recepción y envía enlace de pago.`;
+✅ Confirma recepción y envía enlace de pago.`;
 
-    const url = `https://wa.me/${WHATSAPP_VENDEDOR}?text=${encodeURIComponent(msjPlano)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }
-
-  /** Hours dropdown */
-  function buildHoras(){
-    const el = document.getElementById('entrega-hora');
-    let out = "";
-    for(let h=9; h<=21; h++){
-      for(let m=0; m<60; m+=15){
-        const mm = m===0 ? "00" : String(m);
-        out += `<option value="${h}:${mm}">A las ${h}:${mm}</option>`;
-      }
-    }
-    el.innerHTML = out;
+    window.open(`https://wa.me/${WHATSAPP_VENDEDOR}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
   }
 
-  /** Small escaping helpers */
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-  function escapeHtmlAttr(s){
-    return escapeHtml(s).replace(/`/g,'&#96;');
-  }
+  /** INIT */
+  loadState();
+  setActiveCatBtn(categoriaActual);
+  renderGrid();
+  updateCart();
 </script>
+
 </body>
 </html>
