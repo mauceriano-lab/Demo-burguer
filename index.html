@@ -13,6 +13,9 @@
     .modal-animate { animation: slideUp 0.3s ease-out; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .no-scrollbar::-webkit-scrollbar { display: none; }
+
+    /* Selector cantidad del modal: ancho fijo para no mover nada */
+    .qtybox { width: 132px; }
   </style>
 </head>
 
@@ -42,6 +45,7 @@
            class="w-full pl-9 pr-3 py-3 bg-white border rounded-2xl text-sm font-semibold shadow-sm">
   </div>
 
+  <!-- OJO: aquí NO hay selector de cantidad -->
   <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
 </main>
 
@@ -52,14 +56,30 @@
       <h3 id="modal-p-nombre" class="text-xl font-black uppercase"></h3>
       <button onclick="closeProductModal()" class="text-3xl text-gray-300">&times;</button>
     </div>
+
     <img id="modal-p-img" src="" class="w-full aspect-square object-cover rounded-[2rem] mb-4 shadow-md">
     <p id="modal-p-desc" class="text-gray-500 text-sm mb-6"></p>
 
     <div id="variantes-container" class="space-y-6 mb-8"></div>
 
-    <div class="flex items-center justify-between gap-4 sticky bottom-0 bg-white pt-3 border-t">
-      <span id="modal-p-precio" class="text-2xl font-black"></span>
-      <button id="add-from-modal" class="flex-grow btn-principal py-4 rounded-2xl font-bold uppercase text-xs tracking-widest">Añadir</button>
+    <!-- Barra inferior: Precio + Cantidad (ancho fijo) + Botón -->
+    <div class="flex items-center justify-between gap-3 sticky bottom-0 bg-white pt-3 border-t">
+      <span id="modal-p-precio" class="text-2xl font-black shrink-0"></span>
+
+      <!-- Selector cantidad (NO cambia layout: ancho fijo) -->
+      <div class="qtybox shrink-0">
+        <div class="flex items-center justify-between gap-2 border rounded-2xl px-2 py-2 bg-gray-50">
+          <button type="button" onclick="decModalQty()"
+                  class="w-10 h-10 rounded-xl border bg-white font-black flex items-center justify-center">−</button>
+          <span id="modal-qty" class="w-10 text-center font-black text-sm">1</span>
+          <button type="button" onclick="incModalQty()"
+                  class="w-10 h-10 rounded-xl border bg-white font-black flex items-center justify-center">+</button>
+        </div>
+      </div>
+
+      <button id="add-from-modal" class="flex-grow btn-principal py-4 rounded-2xl font-bold uppercase text-xs tracking-widest">
+        Añadir
+      </button>
     </div>
   </div>
 </div>
@@ -74,7 +94,7 @@
 
     <div id="cart-items" class="space-y-3 mb-6"></div>
 
-    <!-- SOLO datos del cliente -->
+    <!-- SOLO datos del cliente (sin lugar/tipo/hora/pago) -->
     <div class="space-y-4 border-t pt-4">
       <textarea id="cust-notes" placeholder="Notas (talla, color, alergias...)" class="w-full p-3 bg-gray-50 border rounded-xl text-sm h-16" oninput="saveState()"></textarea>
       <input type="text" id="cust-name" placeholder="Tu Nombre" class="w-full p-3 bg-gray-50 border rounded-xl text-sm" oninput="saveState()">
@@ -104,9 +124,9 @@
 
 <script>
   /** CONFIG */
-  const WHATSAPP_VENDEDOR = "34633817413"; // +34 633 817 413 (wa.me sin "+")
+  const WHATSAPP_VENDEDOR = "34633817413"; // +34 633 817 413
   const MONEDA = "€";
-  const LS_KEY = "demo_store_clean_v1";
+  const LS_KEY = "demo_store_modal_qty_v1";
 
   /** PRODUCTOS (4 categorías, 6 c/u) */
   const PRODUCTOS = [
@@ -145,10 +165,11 @@
 
   /** STATE */
   let carrito = [];         // [{k,id,n,p,o,qty}]
-  let seleccionActual = {}; // variantes del modal
+  let seleccionActual = {}; // variantes modal
   let categoriaActual = "Ropa";
   let busqueda = "";
-  let pickQty = {};         // cantidad elegida por tarjeta: { [id]: number }
+  let modalQty = 1;         // cantidad del modal
+  let modalProducto = null; // producto abierto
 
   /** Utils */
   function money(x){ return x.toFixed(2) + MONEDA; }
@@ -163,7 +184,7 @@
   function saveState(){
     const payload = {
       carrito,
-      ui: { categoriaActual, busqueda, pickQty },
+      ui: { categoriaActual, busqueda },
       form: {
         notes: document.getElementById('cust-notes').value,
         name: document.getElementById('cust-name').value,
@@ -173,7 +194,6 @@
     };
     localStorage.setItem(LS_KEY, JSON.stringify(payload));
   }
-
   function loadState(){
     try{
       const s = JSON.parse(localStorage.getItem(LS_KEY));
@@ -181,7 +201,6 @@
       if(s?.ui){
         categoriaActual = s.ui.categoriaActual || categoriaActual;
         busqueda = s.ui.busqueda || "";
-        pickQty = s.ui.pickQty || {};
         document.getElementById("search").value = busqueda;
       }
       if(s?.form){
@@ -193,7 +212,7 @@
     }catch(e){}
   }
 
-  /** Category */
+  /** Category tabs */
   function setActiveCatBtn(cat){
     document.querySelectorAll('.cat-btn').forEach(b => {
       b.classList.remove('bg-black','text-white');
@@ -204,7 +223,6 @@
       }
     });
   }
-
   function filterCat(cat){
     categoriaActual = cat;
     setActiveCatBtn(cat);
@@ -218,18 +236,6 @@
     renderGrid();
   }
 
-  /** Quantity selector in each product card */
-  function getPick(id){ return Math.max(1, Number(pickQty[id] || 1)); }
-  function incPick(id){ pickQty[id] = getPick(id) + 1; saveState(); renderGrid(); }
-  function decPick(id){ pickQty[id] = Math.max(1, getPick(id) - 1); saveState(); renderGrid(); }
-
-  function addFromCard(id){
-    const p = PRODUCTOS.find(x => x.id === id);
-    if(!p) return;
-    const qty = getPick(id);
-    addToCart(p.id, p.nombre, p.precio, {}, qty); // sin variantes desde tarjeta
-  }
-
   /** Grid */
   function renderGrid(){
     const grid = document.getElementById('product-grid');
@@ -241,36 +247,32 @@
         return hay.includes(busqueda);
       });
 
-    grid.innerHTML = list.map(p => {
-      const q = getPick(p.id);
-      return `
-        <div class="bg-white rounded-[2rem] p-3 border border-gray-100 flex flex-col shadow-sm transition-all">
-          <button type="button" onclick="openModal('${escapeAttr(p.id)}')" class="text-left active:scale-[0.99] transition-all">
-            <img src="${p.img}" class="w-full aspect-square object-cover rounded-[1.5rem] mb-2" onerror="this.src='https://picsum.photos/seed/${encodeURIComponent(p.nombre)}/600/600'">
-            <h3 class="text-xs font-black uppercase tracking-tighter">${escapeHtml(p.nombre)}</h3>
-            <p class="font-bold text-sm mt-1 text-black">${money(p.precio)}</p>
-          </button>
-
-          <div class="mt-3 flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-              <button type="button" onclick="decPick('${escapeAttr(p.id)}')" class="px-3 py-2 rounded-xl border bg-white font-black">−</button>
-              <span class="px-3 py-2 rounded-xl border bg-gray-50 font-black min-w-[44px] text-center">${q}</span>
-              <button type="button" onclick="incPick('${escapeAttr(p.id)}')" class="px-3 py-2 rounded-xl border bg-white font-black">+</button>
-            </div>
-            <button type="button" onclick="addFromCard('${escapeAttr(p.id)}')" class="btn-principal px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest">
-              Añadir
-            </button>
-          </div>
-        </div>
-      `;
-    }).join('') || `<div class="col-span-2 text-sm font-bold text-gray-500 bg-white border rounded-2xl p-4">No hay resultados.</div>`;
+    grid.innerHTML = list.map(p => `
+      <div onclick="openModal('${escapeAttr(p.id)}')" class="bg-white rounded-[2rem] p-3 border border-gray-100 flex flex-col shadow-sm cursor-pointer active:scale-95 transition-all">
+        <img src="${p.img}" class="w-full aspect-square object-cover rounded-[1.5rem] mb-2" onerror="this.src='https://picsum.photos/seed/${encodeURIComponent(p.nombre)}/600/600'">
+        <h3 class="text-xs font-black uppercase tracking-tighter">${escapeHtml(p.nombre)}</h3>
+        <p class="font-bold text-sm mt-1 text-black">${money(p.precio)}</p>
+      </div>
+    `).join('') || `<div class="col-span-2 text-sm font-bold text-gray-500 bg-white border rounded-2xl p-4">No hay resultados.</div>`;
   }
+
+  /** Modal qty controls */
+  function syncModalQty(){
+    document.getElementById('modal-qty').innerText = String(modalQty);
+  }
+  function incModalQty(){ modalQty += 1; syncModalQty(); }
+  function decModalQty(){ modalQty = Math.max(1, modalQty - 1); syncModalQty(); }
 
   /** Modal */
   function openModal(id) {
     const p = PRODUCTOS.find(prod => prod.id === id);
     if(!p) return;
+    modalProducto = p;
     seleccionActual = {};
+
+    // reset qty each time you open modal
+    modalQty = 1;
+    syncModalQty();
 
     document.getElementById('modal-p-nombre').innerText = p.nombre;
     document.getElementById('modal-p-img').src = p.img;
@@ -299,8 +301,7 @@
     });
 
     document.getElementById('add-from-modal').onclick = () => {
-      // Desde modal: añade 1 unidad con variantes
-      addToCart(p.id, p.nombre, p.precio, {...seleccionActual}, 1);
+      addToCart(p.id, p.nombre, p.precio, {...seleccionActual}, modalQty);
       closeProductModal();
     };
 
@@ -400,7 +401,7 @@
     document.getElementById('total-val').innerText = money(total);
   }
 
-  /** WhatsApp (SIN lugar/tipo/hora/pago) */
+  /** WhatsApp (sin lugar/tipo/hora/pago) */
   function enviarPedido() {
     const nombre = (document.getElementById('cust-name').value || "").trim();
     const tlf = (document.getElementById('cust-phone').value || "").trim();
