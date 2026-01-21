@@ -3,19 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tienda Demo | Pedido por WhatsApp</title>
+  <title>PideLink</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root { --btn: #000000; --txt: #000000; --bg: #f9fafb; }
+    :root { --btn:#000000; --txt:#000000; --bg:#f9fafb; }
     body { background-color: var(--bg); color: var(--txt); font-family: system-ui, -apple-system, sans-serif; }
     .btn-principal { background-color: var(--btn) !important; color: white; }
-    .modal-animate { animation: slideUp 0.3s ease-out; }
+    .modal-animate { animation: slideUp .3s ease-out; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .no-scrollbar::-webkit-scrollbar { display: none; }
-
-    /* Selector cantidad del modal: ancho fijo para no mover nada */
-    .qtybox { width: 132px; }
+    .qtybox { width: 132px; } /* ancho fijo para no mover nada en la barra inferior del modal */
   </style>
 </head>
 
@@ -23,18 +21,15 @@
 
 <header class="bg-white sticky top-0 z-40 border-b shadow-sm">
   <div class="max-w-md mx-auto px-5 py-4 flex justify-between items-center">
-    <h1 class="text-xl font-black italic tracking-tighter uppercase">TIENDA DEMO 🛍️</h1>
+    <h1 id="store-title" class="text-xl font-black italic tracking-tighter uppercase">PIDELINK</h1>
     <button onclick="toggleCart()" class="relative p-2 bg-gray-100 rounded-full">
       <i class="fa-solid fa-shopping-bag text-xl"></i>
       <span id="cart-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
     </button>
   </div>
 
-  <div class="max-w-md mx-auto px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-t bg-white">
-    <button onclick="filterCat('Ropa')" class="cat-btn bg-black text-white px-5 py-2 rounded-full text-xs font-bold shrink-0">Ropa</button>
-    <button onclick="filterCat('Belleza')" class="cat-btn bg-gray-100 text-black px-5 py-2 rounded-full text-xs font-bold shrink-0">Belleza</button>
-    <button onclick="filterCat('Hogar')" class="cat-btn bg-gray-100 text-black px-5 py-2 rounded-full text-xs font-bold shrink-0">Hogar</button>
-    <button onclick="filterCat('Accesorios')" class="cat-btn bg-gray-100 text-black px-5 py-2 rounded-full text-xs font-bold shrink-0">Accesorios</button>
+  <div id="cats-bar" class="max-w-md mx-auto px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-t bg-white">
+    <!-- categorías dinámicas -->
   </div>
 </header>
 
@@ -45,8 +40,16 @@
            class="w-full pl-9 pr-3 py-3 bg-white border rounded-2xl text-sm font-semibold shadow-sm">
   </div>
 
-  <!-- OJO: aquí NO hay selector de cantidad -->
   <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
+
+  <div id="load-error" class="hidden mt-4 bg-white border rounded-2xl p-4 text-sm font-bold text-red-600">
+    No se pudo cargar el catálogo desde Google Sheets. Revisa:
+    <ul class="list-disc pl-5 mt-2 text-red-600 font-semibold">
+      <li>Que el Sheet esté “Publicado en la web”.</li>
+      <li>Que el SHEET_ID sea correcto.</li>
+      <li>Que las hojas se llamen EXACTO: <span class="font-black">Config</span> y <span class="font-black">Products</span>.</li>
+    </ul>
+  </div>
 </main>
 
 <!-- Product modal -->
@@ -62,11 +65,10 @@
 
     <div id="variantes-container" class="space-y-6 mb-8"></div>
 
-    <!-- Barra inferior: Precio + Cantidad (ancho fijo) + Botón -->
+    <!-- Barra inferior: Precio + Cantidad + Botón -->
     <div class="flex items-center justify-between gap-3 sticky bottom-0 bg-white pt-3 border-t">
       <span id="modal-p-precio" class="text-2xl font-black shrink-0"></span>
 
-      <!-- Selector cantidad (NO cambia layout: ancho fijo) -->
       <div class="qtybox shrink-0">
         <div class="flex items-center justify-between gap-2 border rounded-2xl px-2 py-2 bg-gray-50">
           <button type="button" onclick="decModalQty()"
@@ -94,16 +96,16 @@
 
     <div id="cart-items" class="space-y-3 mb-6"></div>
 
-    <!-- SOLO datos del cliente (sin lugar/tipo/hora/pago) -->
+    <!-- Solo datos del cliente -->
     <div class="space-y-4 border-t pt-4">
-      <textarea id="cust-notes" placeholder="Notas (talla, color, alergias...)" class="w-full p-3 bg-gray-50 border rounded-xl text-sm h-16" oninput="saveState()"></textarea>
+      <textarea id="cust-notes" placeholder="Notas (talla, color, referencias...)" class="w-full p-3 bg-gray-50 border rounded-xl text-sm h-16" oninput="saveState()"></textarea>
       <input type="text" id="cust-name" placeholder="Tu Nombre" class="w-full p-3 bg-gray-50 border rounded-xl text-sm" oninput="saveState()">
       <input type="tel" id="cust-phone" placeholder="Tu Teléfono" class="w-full p-3 bg-gray-50 border rounded-xl text-sm" oninput="saveState()">
       <input type="text" id="cust-address" placeholder="Dirección completa" class="w-full p-3 bg-gray-50 border rounded-xl text-sm" oninput="saveState()">
 
       <div class="flex justify-between text-2xl font-black pt-2">
         <span>TOTAL:</span>
-        <span id="total-val">0.00€</span>
+        <span id="total-val">0</span>
       </div>
 
       <div class="flex gap-2">
@@ -123,308 +125,329 @@
 </div>
 
 <script>
-  /** CONFIG */
-  const WHATSAPP_VENDEDOR = "34633817413"; // +34 633 817 413
-  const MONEDA = "€";
-  const LS_KEY = "demo_store_modal_qty_v1";
+/** =========================
+ *  1) CONECTA TU GOOGLE SHEET
+ *  =========================
+ * Pega aquí el ID del Sheet:
+ * https://docs.google.com/spreadsheets/d/ESTE_ID/edit#gid=0
+ */
+const SHEET_ID = "PON_AQUI_TU_SHEET_ID";
 
-  /** PRODUCTOS (4 categorías, 6 c/u) */
-  const PRODUCTOS = [
-    // Ropa (6)
-    { id:"ropa-1", cat:"Ropa", nombre:"Playera Básica Algodón", precio:12.90, desc:"Algodón suave, corte unisex. Ideal para diario.", img:"https://images.unsplash.com/photo-1520975661595-6453be3f7070?w=500", Talla:"S, M, L, XL", Color:"Negro, Blanco, Gris" },
-    { id:"ropa-2", cat:"Ropa", nombre:"Sudadera Oversize", precio:29.90, desc:"Interior afelpado, estilo urbano.", img:"https://images.unsplash.com/photo-1520975958225-ff7f128a02e9?w=500", Talla:"S, M, L, XL", Color:"Negro, Arena" },
-    { id:"ropa-3", cat:"Ropa", nombre:"Gorra Bordada", precio:14.50, desc:"Ajustable, bordado frontal.", img:"https://images.unsplash.com/photo-1520975687960-5f5b89a1cdd6?w=500", Color:"Negro, Beige, Azul" },
-    { id:"ropa-4", cat:"Ropa", nombre:"Calcetas Deportivas (Pack x3)", precio:9.90, desc:"Transpirables, soporte en arco.", img:"https://images.unsplash.com/photo-1582738412142-75b1a36c5c2d?w=500", Talla:"CH, M, G" },
-    { id:"ropa-5", cat:"Ropa", nombre:"Tote Bag Resistente", precio:11.00, desc:"Lona gruesa, ideal para mandado.", img:"https://images.unsplash.com/photo-1520975680963-9b3cbb6f0a77?w=500", Color:"Natural, Negro" },
-    { id:"ropa-6", cat:"Ropa", nombre:"Rompevientos Ligero", precio:34.90, desc:"Ligero y cómodo, para clima variable.", img:"https://images.unsplash.com/photo-1520975749810-05e25f4c7d11?w=500", Talla:"S, M, L, XL" },
+/** Hojas (deben llamarse EXACTO así) */
+const SHEET_CONFIG = "Config";
+const SHEET_PRODUCTS = "Products";
 
-    // Belleza (6)
-    { id:"bel-1", cat:"Belleza", nombre:"Bálsamo Labial", precio:4.50, desc:"Hidratación diaria, aroma suave.", img:"https://images.unsplash.com/photo-1612810436541-336d7c0f7fd6?w=500", Sabor:"Vainilla, Menta, Coco" },
-    { id:"bel-2", cat:"Belleza", nombre:"Crema de Manos", precio:6.90, desc:"Rápida absorción, no grasosa.", img:"https://images.unsplash.com/photo-1585232351009-aa87416fca90?w=500", Sabor:"Karité, Almendra" },
-    { id:"bel-3", cat:"Belleza", nombre:"Jabón Artesanal", precio:5.20, desc:"Hecho a mano. Suave con la piel.", img:"https://images.unsplash.com/photo-1607006344380-b6775a0824ce?w=500", Tipo:"Avena, Lavanda, Carbón" },
-    { id:"bel-4", cat:"Belleza", nombre:"Perfume Roll-on 10ml", precio:9.90, desc:"Fragancia práctica para bolsa.", img:"https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=500", Modelo:"Dulce, Fresco, Amaderado" },
-    { id:"bel-5", cat:"Belleza", nombre:"Serum Vitamina C", precio:16.90, desc:"Ilumina y unifica (uso diario).", img:"https://images.unsplash.com/photo-1611930022073-84fbbd9f19b1?w=500", Tipo:"Suave, Concentrado" },
-    { id:"bel-6", cat:"Belleza", nombre:"Kit Skincare (Mini)", precio:18.00, desc:"Limpieza + hidratación (tamaño viaje).", img:"https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=500", Tipo:"Piel seca, Piel mixta, Piel grasa" },
+/** Persistencia */
+const LS_KEY = "pidelink_store_v1";
 
-    // Hogar (6)
-    { id:"hog-1", cat:"Hogar", nombre:"Vela Aromática", precio:11.50, desc:"Aroma cálido, envase de vidrio.", img:"https://images.unsplash.com/photo-1602874801007-8a3b3d5f13d8?w=500", Sabor:"Vainilla, Canela, Lavanda" },
-    { id:"hog-2", cat:"Hogar", nombre:"Difusor de Varillas", precio:15.90, desc:"Aroma constante en tu espacio.", img:"https://images.unsplash.com/photo-1602874801085-21c95b6f7b67?w=500", Sabor:"Cítrico, Floral" },
-    { id:"hog-3", cat:"Hogar", nombre:"Taza Cerámica 330ml", precio:8.20, desc:"Apta microondas. Minimalista.", img:"https://images.unsplash.com/photo-1517705008128-361805f42e86?w=500", Color:"Blanco, Negro" },
-    { id:"hog-4", cat:"Hogar", nombre:"Botella Térmica 500ml", precio:19.90, desc:"Acero inoxidable. Frío/calor.", img:"https://images.unsplash.com/photo-1526401485004-2aa7c9f53c62?w=500", Color:"Negro, Plateado" },
-    { id:"hog-5", cat:"Hogar", nombre:"Organizador Escritorio", precio:12.90, desc:"Ordena cables, notas y accesorios.", img:"https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=500", Material:"Madera, Metal" },
-    { id:"hog-6", cat:"Hogar", nombre:"Set Toallas (2 piezas)", precio:21.00, desc:"Suaves y absorbentes.", img:"https://images.unsplash.com/photo-1582582621959-48d27397dc5c?w=500", Color:"Blanco, Gris" },
+/** Estado */
+let CONFIG = {
+  store_name: "PideLink",
+  currency_code: "MXN",
+  whatsapp_phone_e164: "5210000000000",
+  theme_button_color: "#000000",
+  theme_bg: "#f9fafb",
+  theme_text: "#000000"
+};
 
-    // Accesorios (6)
-    { id:"acc-1", cat:"Accesorios", nombre:"Cargador USB-C 20W", precio:14.90, desc:"Carga rápida compatible.", img:"https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=500", Modelo:"EU, US" },
-    { id:"acc-2", cat:"Accesorios", nombre:"Cable Trenzado 1.5m", precio:7.90, desc:"Resistente, ideal uso diario.", img:"https://images.unsplash.com/photo-1583863788435-4a8f8d6b7a6b?w=500", Tipo:"USB-C, Lightning" },
-    { id:"acc-3", cat:"Accesorios", nombre:"Audífonos In-ear", precio:18.90, desc:"Buen audio para llamadas y música.", img:"https://images.unsplash.com/photo-1585386959984-a41552231693?w=500", Color:"Negro, Blanco" },
-    { id:"acc-4", cat:"Accesorios", nombre:"Soporte de Celular", precio:9.50, desc:"Para escritorio o cocina. Ajustable.", img:"https://images.unsplash.com/photo-1512499617640-c2f999fe2a5d?w=500", Tipo:"Metal, Plástico" },
-    { id:"acc-5", cat:"Accesorios", nombre:"Power Bank 10,000mAh", precio:24.90, desc:"Compacta, carga dos dispositivos.", img:"https://images.unsplash.com/photo-1602524205579-8a3f997e98c3?w=500", Modelo:"Negro, Azul" },
-    { id:"acc-6", cat:"Accesorios", nombre:"Llavero Minimal", precio:4.20, desc:"Ligero y elegante.", img:"https://images.unsplash.com/photo-1520975681324-3b8f9e8b8d50?w=500", Material:"Acero, Cuero" },
-  ];
+let PRODUCTOS = [];   // cargados desde Sheets
+let carrito = [];     // [{k,id,n,p,o,qty}]
+let seleccionActual = {};
+let categoriaActual = "";
+let busqueda = "";
+let modalQty = 1;
+let modalProducto = null;
 
-  /** STATE */
-  let carrito = [];         // [{k,id,n,p,o,qty}]
-  let seleccionActual = {}; // variantes modal
-  let categoriaActual = "Ropa";
-  let busqueda = "";
-  let modalQty = 1;         // cantidad del modal
-  let modalProducto = null; // producto abierto
-
-  /** Utils */
-  function money(x){ return x.toFixed(2) + MONEDA; }
-  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  function escapeAttr(s){ return escapeHtml(s).replace(/`/g,'&#96;'); }
-  function keyOf(id, o){
-    const opts = Object.entries(o||{}).sort(([a],[b]) => a.localeCompare(b));
-    return id + "||" + JSON.stringify(opts);
+/** Utils */
+function escapeHtml(s){ return String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escapeAttr(s){ return escapeHtml(s).replace(/`/g,'&#96;'); }
+function keyOf(id, o){
+  const opts = Object.entries(o||{}).sort(([a],[b]) => a.localeCompare(b));
+  return id + "||" + JSON.stringify(opts);
+}
+function fmtMoney(n){
+  const code = CONFIG.currency_code || "MXN";
+  try{
+    return new Intl.NumberFormat("es-MX", { style:"currency", currency: code }).format(Number(n)||0);
+  }catch(e){
+    return "$" + (Number(n)||0).toFixed(2);
   }
+}
 
-  /** Persistence */
-  function saveState(){
-    const payload = {
-      carrito,
-      ui: { categoriaActual, busqueda },
-      form: {
-        notes: document.getElementById('cust-notes').value,
-        name: document.getElementById('cust-name').value,
-        phone: document.getElementById('cust-phone').value,
-        address: document.getElementById('cust-address').value
-      }
-    };
-    localStorage.setItem(LS_KEY, JSON.stringify(payload));
-  }
-  function loadState(){
-    try{
-      const s = JSON.parse(localStorage.getItem(LS_KEY));
-      if(s?.carrito) carrito = s.carrito;
-      if(s?.ui){
-        categoriaActual = s.ui.categoriaActual || categoriaActual;
-        busqueda = s.ui.busqueda || "";
-        document.getElementById("search").value = busqueda;
-      }
-      if(s?.form){
-        document.getElementById('cust-notes').value = s.form.notes || "";
-        document.getElementById('cust-name').value = s.form.name || "";
-        document.getElementById('cust-phone').value = s.form.phone || "";
-        document.getElementById('cust-address').value = s.form.address || "";
-      }
-    }catch(e){}
-  }
+/** Google Sheets fetch via gviz */
+async function fetchSheetRows(sheetName){
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+  const res = await fetch(url, { cache: "no-store" });
+  if(!res.ok) throw new Error("Fetch failed: " + sheetName);
+  const txt = await res.text();
+  const json = JSON.parse(txt.substring(txt.indexOf("{"), txt.lastIndexOf("}") + 1));
+  const table = json.table;
+  const headers = table.cols.map(c => (c.label || "").trim());
+  const rows = (table.rows || []).map(r => (r.c || []).map(x => x ? (x.v ?? "") : ""));
+  return { headers, rows };
+}
 
-  /** Category tabs */
-  function setActiveCatBtn(cat){
-    document.querySelectorAll('.cat-btn').forEach(b => {
-      b.classList.remove('bg-black','text-white');
-      b.classList.add('bg-gray-100','text-black');
-      if(b.innerText === cat){
-        b.classList.add('bg-black','text-white');
-        b.classList.remove('bg-gray-100');
-      }
-    });
-  }
-  function filterCat(cat){
-    categoriaActual = cat;
-    setActiveCatBtn(cat);
-    saveState();
-    renderGrid();
-  }
+async function loadFromSheets(){
+  const errBox = document.getElementById("load-error");
+  errBox.classList.add("hidden");
 
-  function applySearch(){
-    busqueda = (document.getElementById("search").value || "").trim().toLowerCase();
-    saveState();
-    renderGrid();
-  }
+  // Config
+  const cfg = await fetchSheetRows(SHEET_CONFIG);
+  // Espera columnas: key, value
+  const keyIdx = cfg.headers.findIndex(h => h.toLowerCase() === "key");
+  const valIdx = cfg.headers.findIndex(h => h.toLowerCase() === "value");
+  cfg.rows.forEach(r => {
+    const k = String(r[keyIdx] ?? "").trim();
+    const v = String(r[valIdx] ?? "").trim();
+    if(k) CONFIG[k] = v;
+  });
 
-  /** Grid */
-  function renderGrid(){
-    const grid = document.getElementById('product-grid');
-    const list = PRODUCTOS
-      .filter(p => p.cat === categoriaActual)
-      .filter(p => {
-        if(!busqueda) return true;
-        const hay = (p.nombre + " " + p.desc + " " + JSON.stringify(p)).toLowerCase();
-        return hay.includes(busqueda);
-      });
+  // Theme
+  document.documentElement.style.setProperty("--btn", CONFIG.theme_button_color || "#000000");
+  document.documentElement.style.setProperty("--bg",  CONFIG.theme_bg || "#f9fafb");
+  document.documentElement.style.setProperty("--txt", CONFIG.theme_text || "#000000");
 
-    grid.innerHTML = list.map(p => `
-      <div onclick="openModal('${escapeAttr(p.id)}')" class="bg-white rounded-[2rem] p-3 border border-gray-100 flex flex-col shadow-sm cursor-pointer active:scale-95 transition-all">
-        <img src="${p.img}" class="w-full aspect-square object-cover rounded-[1.5rem] mb-2" onerror="this.src='https://picsum.photos/seed/${encodeURIComponent(p.nombre)}/600/600'">
-        <h3 class="text-xs font-black uppercase tracking-tighter">${escapeHtml(p.nombre)}</h3>
-        <p class="font-bold text-sm mt-1 text-black">${money(p.precio)}</p>
-      </div>
-    `).join('') || `<div class="col-span-2 text-sm font-bold text-gray-500 bg-white border rounded-2xl p-4">No hay resultados.</div>`;
-  }
+  document.getElementById("store-title").innerText = (CONFIG.store_name || "PideLink").toUpperCase();
 
-  /** Modal qty controls */
-  function syncModalQty(){
-    document.getElementById('modal-qty').innerText = String(modalQty);
-  }
-  function incModalQty(){ modalQty += 1; syncModalQty(); }
-  function decModalQty(){ modalQty = Math.max(1, modalQty - 1); syncModalQty(); }
+  // Products
+  const prod = await fetchSheetRows(SHEET_PRODUCTS);
+  const idx = {};
+  prod.headers.forEach((h,i)=> idx[h.trim()] = i);
 
-  /** Modal */
-  function openModal(id) {
-    const p = PRODUCTOS.find(prod => prod.id === id);
-    if(!p) return;
-    modalProducto = p;
-    seleccionActual = {};
+  PRODUCTOS = prod.rows
+    .map(r => ({
+      id: String(r[idx["id"]] ?? "").trim(),
+      cat: String(r[idx["category"]] ?? "").trim(),
+      nombre: String(r[idx["name"]] ?? "").trim(),
+      precio: Number(r[idx["price"]] ?? 0),
+      desc: String(r[idx["description"]] ?? "").trim(),
+      img: String(r[idx["image_url"]] ?? "").trim(),
+      Talla: String(r[idx["variants_Talla"]] ?? "").trim(),
+      Color: String(r[idx["variants_Color"]] ?? "").trim(),
+      Material: String(r[idx["variants_Material"]] ?? "").trim(),
+      Sabor: String(r[idx["variants_Sabor"]] ?? "").trim(),
+      Modelo: String(r[idx["variants_Modelo"]] ?? "").trim(),
+      Tipo: String(r[idx["variants_Tipo"]] ?? "").trim(),
+      active: String(r[idx["active"]] ?? "TRUE").trim().toUpperCase() !== "FALSE",
+    }))
+    .filter(p => p.id && p.cat && p.nombre && p.active);
 
-    // reset qty each time you open modal
-    modalQty = 1;
-    syncModalQty();
+  if(PRODUCTOS.length === 0) throw new Error("No products");
 
-    document.getElementById('modal-p-nombre').innerText = p.nombre;
-    document.getElementById('modal-p-img').src = p.img;
-    document.getElementById('modal-p-desc').innerText = p.desc;
-    document.getElementById('modal-p-precio').innerText = money(p.precio);
+  // categorías dinámicas
+  const cats = [...new Set(PRODUCTOS.map(p=>p.cat))];
+  categoriaActual = categoriaActual || cats[0];
+  buildCatsBar(cats);
 
-    const cont = document.getElementById('variantes-container');
-    cont.innerHTML = "";
+  renderGrid();
+  updateCart();
+}
 
-    ['Talla', 'Color', 'Material', 'Sabor', 'Modelo', 'Tipo'].forEach(key => {
-      if(p[key]) {
-        const opciones = String(p[key]).split(',').map(o => o.trim()).filter(Boolean);
-        cont.innerHTML += `
-          <div>
-            <label class="text-[10px] font-bold text-gray-400 block mb-2 uppercase">${escapeHtml(key)}</label>
-            <div class="flex gap-2 flex-wrap" id="g-${key}">
-              ${opciones.map(o => `
-                <button type="button" onclick="sel(this, '${key}', '${escapeAttr(o)}')" class="border-2 px-4 py-2 rounded-xl text-xs font-bold">
-                  ${escapeHtml(o)}
-                </button>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }
+function buildCatsBar(cats){
+  const bar = document.getElementById("cats-bar");
+  bar.innerHTML = cats.map((c,i) => `
+    <button onclick="filterCat('${escapeAttr(c)}')" class="cat-btn ${c===categoriaActual ? "bg-black text-white" : "bg-gray-100 text-black"} px-5 py-2 rounded-full text-xs font-bold shrink-0">
+      ${escapeHtml(c)}
+    </button>
+  `).join("");
+}
+
+function setActiveCatBtn(cat){
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.classList.remove('bg-black','text-white');
+    b.classList.add('bg-gray-100','text-black');
+    if(b.innerText === cat){
+      b.classList.add('bg-black','text-white');
+      b.classList.remove('bg-gray-100');
+    }
+  });
+}
+
+/** Search */
+function applySearch(){
+  busqueda = (document.getElementById("search").value || "").trim().toLowerCase();
+  saveState();
+  renderGrid();
+}
+
+/** Grid */
+function filterCat(cat){
+  categoriaActual = cat;
+  setActiveCatBtn(cat);
+  saveState();
+  renderGrid();
+}
+
+function renderGrid(){
+  const grid = document.getElementById('product-grid');
+  const list = PRODUCTOS
+    .filter(p => p.cat === categoriaActual)
+    .filter(p => {
+      if(!busqueda) return true;
+      const hay = (p.nombre + " " + p.desc + " " + JSON.stringify(p)).toLowerCase();
+      return hay.includes(busqueda);
     });
 
-    document.getElementById('add-from-modal').onclick = () => {
-      addToCart(p.id, p.nombre, p.precio, {...seleccionActual}, modalQty);
-      closeProductModal();
-    };
+  grid.innerHTML = list.map(p => `
+    <div onclick="openModal('${escapeAttr(p.id)}')" class="bg-white rounded-[2rem] p-3 border border-gray-100 flex flex-col shadow-sm cursor-pointer active:scale-95 transition-all">
+      <img src="${p.img}" class="w-full aspect-square object-cover rounded-[1.5rem] mb-2"
+           onerror="this.src='https://picsum.photos/seed/${encodeURIComponent(p.nombre)}/600/600'">
+      <h3 class="text-xs font-black uppercase tracking-tighter">${escapeHtml(p.nombre)}</h3>
+      <p class="font-bold text-sm mt-1 text-black">${escapeHtml(fmtMoney(p.precio))}</p>
+    </div>
+  `).join('') || `<div class="col-span-2 text-sm font-bold text-gray-500 bg-white border rounded-2xl p-4">No hay resultados.</div>`;
+}
 
-    document.getElementById('product-modal').classList.remove('hidden');
-  }
+/** Modal qty */
+function syncModalQty(){ document.getElementById('modal-qty').innerText = String(modalQty); }
+function incModalQty(){ modalQty += 1; syncModalQty(); }
+function decModalQty(){ modalQty = Math.max(1, modalQty - 1); syncModalQty(); }
 
-  function sel(btn, k, v) {
-    document.querySelectorAll(`#g-${k} button`).forEach(b => b.classList.remove('bg-black', 'text-white', 'border-black'));
-    btn.classList.add('bg-black', 'text-white', 'border-black');
-    seleccionActual[k] = v;
-  }
+/** Modal */
+function openModal(id){
+  const p = PRODUCTOS.find(x => x.id === id);
+  if(!p) return;
+  modalProducto = p;
+  seleccionActual = {};
+  modalQty = 1; syncModalQty();
 
-  function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
-  function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); }
+  document.getElementById('modal-p-nombre').innerText = p.nombre;
+  document.getElementById('modal-p-img').src = p.img;
+  document.getElementById('modal-p-desc').innerText = p.desc;
+  document.getElementById('modal-p-precio').innerText = fmtMoney(p.precio);
 
-  /** Cart */
-  function addToCart(id, n, p, o, qty){
-    const k = keyOf(id, o);
-    const found = carrito.find(x => x.k === k);
-    if(found) found.qty += qty;
-    else carrito.push({ k, id, n, p, o, qty });
-    saveState();
-    updateCart();
-  }
+  const cont = document.getElementById('variantes-container');
+  cont.innerHTML = "";
 
-  function incItem(k){
-    const it = carrito.find(x => x.k === k);
-    if(!it) return;
-    it.qty += 1;
-    saveState();
-    updateCart();
-  }
-
-  function decItem(k){
-    const it = carrito.find(x => x.k === k);
-    if(!it) return;
-    it.qty -= 1;
-    if(it.qty <= 0) carrito = carrito.filter(x => x.k !== k);
-    saveState();
-    updateCart();
-  }
-
-  function removeItem(k){
-    carrito = carrito.filter(x => x.k !== k);
-    saveState();
-    updateCart();
-  }
-
-  function vaciarCarrito(){
-    if(!confirm("¿Vaciar carrito?")) return;
-    carrito = [];
-    saveState();
-    updateCart();
-  }
-
-  function updateCart() {
-    const count = carrito.reduce((s,x)=>s+x.qty,0);
-    document.getElementById('cart-count').innerText = count;
-
-    let total = 0;
-    document.getElementById('cart-items').innerHTML = carrito.map(it => {
-      const variantes = Object.values(it.o||{}).join(' / ') || 'Sin variantes';
-      const lineTotal = it.p * it.qty;
-      total += lineTotal;
-
-      return `
-        <div class="bg-gray-50 p-3 rounded-2xl text-xs font-bold">
-          <div class="flex justify-between gap-3">
-            <div>
-              <span>${escapeHtml(it.n)}</span><br>
-              <small class="text-gray-400">${escapeHtml(variantes)}</small>
-            </div>
-            <div class="text-right whitespace-nowrap">
-              <div>${money(lineTotal)}</div>
-              <div class="text-[10px] text-gray-400 font-black">${money(it.p)} c/u</div>
-            </div>
-          </div>
-
-          <div class="mt-3 flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-              <button type="button" onclick="decItem('${escapeAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black">−</button>
-              <span class="px-3 py-2 rounded-xl border bg-white font-black">${it.qty}</span>
-              <button type="button" onclick="incItem('${escapeAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black">+</button>
-            </div>
-            <button type="button" onclick="removeItem('${escapeAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black text-red-600">
-              <i class="fa-solid fa-trash"></i>
-            </button>
+  ['Talla', 'Color', 'Material', 'Sabor', 'Modelo', 'Tipo'].forEach(key => {
+    if(p[key]) {
+      const opciones = String(p[key]).split(',').map(o => o.trim()).filter(Boolean);
+      cont.innerHTML += `
+        <div>
+          <label class="text-[10px] font-bold text-gray-400 block mb-2 uppercase">${escapeHtml(key)}</label>
+          <div class="flex gap-2 flex-wrap" id="g-${key}">
+            ${opciones.map(o => `
+              <button type="button" onclick="sel(this, '${key}', '${escapeAttr(o)}')" class="border-2 px-4 py-2 rounded-xl text-xs font-bold">
+                ${escapeHtml(o)}
+              </button>
+            `).join('')}
           </div>
         </div>
       `;
-    }).join('') || `
-      <div class="bg-gray-50 p-4 rounded-2xl text-sm font-bold text-gray-500">
-        Tu carrito está vacío. Agrega productos para poder enviar el pedido.
+    }
+  });
+
+  document.getElementById('add-from-modal').onclick = () => {
+    addToCart(p.id, p.nombre, p.precio, {...seleccionActual}, modalQty);
+    closeProductModal();
+  };
+
+  document.getElementById('product-modal').classList.remove('hidden');
+}
+
+function sel(btn, k, v){
+  document.querySelectorAll(`#g-${k} button`).forEach(b => b.classList.remove('bg-black', 'text-white', 'border-black'));
+  btn.classList.add('bg-black', 'text-white', 'border-black');
+  seleccionActual[k] = v;
+}
+
+function closeProductModal(){ document.getElementById('product-modal').classList.add('hidden'); }
+function toggleCart(){ document.getElementById('cart-modal').classList.toggle('hidden'); }
+
+/** Cart */
+function addToCart(id, n, p, o, qty){
+  const k = keyOf(id, o);
+  const found = carrito.find(x => x.k === k);
+  if(found) found.qty += qty;
+  else carrito.push({ k, id, n, p, o, qty });
+  saveState();
+  updateCart();
+}
+
+function incItem(k){
+  const it = carrito.find(x => x.k === k); if(!it) return;
+  it.qty += 1; saveState(); updateCart();
+}
+function decItem(k){
+  const it = carrito.find(x => x.k === k); if(!it) return;
+  it.qty -= 1;
+  if(it.qty <= 0) carrito = carrito.filter(x => x.k !== k);
+  saveState(); updateCart();
+}
+function removeItem(k){ carrito = carrito.filter(x => x.k !== k); saveState(); updateCart(); }
+function vaciarCarrito(){ if(!confirm("¿Vaciar carrito?")) return; carrito = []; saveState(); updateCart(); }
+
+function updateCart(){
+  const count = carrito.reduce((s,x)=>s+x.qty,0);
+  document.getElementById('cart-count').innerText = count;
+
+  let total = 0;
+  document.getElementById('cart-items').innerHTML = carrito.map(it => {
+    const variantes = Object.values(it.o||{}).join(' / ') || 'Sin variantes';
+    const lineTotal = (Number(it.p)||0) * (Number(it.qty)||0);
+    total += lineTotal;
+
+    return `
+      <div class="bg-gray-50 p-3 rounded-2xl text-xs font-bold">
+        <div class="flex justify-between gap-3">
+          <div>
+            <span>${escapeHtml(it.n)}</span><br>
+            <small class="text-gray-400">${escapeHtml(variantes)}</small>
+          </div>
+          <div class="text-right whitespace-nowrap">
+            <div>${escapeHtml(fmtMoney(lineTotal))}</div>
+            <div class="text-[10px] text-gray-400 font-black">${escapeHtml(fmtMoney(it.p))} c/u</div>
+          </div>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="decItem('${escapeAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black">−</button>
+            <span class="px-3 py-2 rounded-xl border bg-white font-black">${it.qty}</span>
+            <button type="button" onclick="incItem('${escapeAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black">+</button>
+          </div>
+          <button type="button" onclick="removeItem('${escapeAttr(it.k)}')" class="px-3 py-2 rounded-xl border bg-white font-black text-red-600">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
       </div>
     `;
+  }).join('') || `
+    <div class="bg-gray-50 p-4 rounded-2xl text-sm font-bold text-gray-500">
+      Tu carrito está vacío. Agrega productos para poder enviar el pedido.
+    </div>
+  `;
 
-    document.getElementById('total-val').innerText = money(total);
-  }
+  document.getElementById('total-val').innerText = fmtMoney(total);
+}
 
-  /** WhatsApp (sin lugar/tipo/hora/pago) */
-  function enviarPedido() {
-    const nombre = (document.getElementById('cust-name').value || "").trim();
-    const tlf = (document.getElementById('cust-phone').value || "").trim();
-    const addr = (document.getElementById('cust-address').value || "").trim();
-    const notas = (document.getElementById('cust-notes').value || "").trim();
+/** WhatsApp */
+function enviarPedido(){
+  const nombre = (document.getElementById('cust-name').value || "").trim();
+  const tlf = (document.getElementById('cust-phone').value || "").trim();
+  const addr = (document.getElementById('cust-address').value || "").trim();
+  const notas = (document.getElementById('cust-notes').value || "").trim();
 
-    if(carrito.length === 0) return alert("Tu carrito está vacío.");
-    if(!nombre || nombre.length < 2) return alert("Escribe tu nombre.");
-    if(!tlf || tlf.length < 6) return alert("Escribe tu teléfono.");
-    if(!addr || addr.length < 6) return alert("Escribe tu dirección completa.");
+  if(carrito.length === 0) return alert("Tu carrito está vacío.");
+  if(!nombre || nombre.length < 2) return alert("Escribe tu nombre.");
+  if(!tlf || tlf.length < 6) return alert("Escribe tu teléfono.");
+  if(!addr || addr.length < 6) return alert("Escribe tu dirección completa.");
 
-    let lista = "";
-    let total = 0;
+  const phone = String(CONFIG.whatsapp_phone_e164 || "").trim();
+  if(!/^\d{8,15}$/.test(phone)) return alert("Config inválida: whatsapp_phone_e164 debe ser números sin + (E.164).");
 
-    carrito.forEach(it => {
-      const variantes = Object.values(it.o||{}).join(' / ') || "Sin variantes";
-      const lineTotal = it.p * it.qty;
-      total += lineTotal;
-      lista += `• ${it.n} x${it.qty} [${variantes}] (${money(lineTotal)})\n`;
-    });
+  let lista = "";
+  let total = 0;
+  carrito.forEach(it => {
+    const variantes = Object.values(it.o||{}).join(' / ') || "Sin variantes";
+    const lineTotal = (Number(it.p)||0) * (Number(it.qty)||0);
+    total += lineTotal;
+    lista += `• ${it.n} x${it.qty} [${variantes}] (${fmtMoney(lineTotal)})\n`;
+  });
 
-    const msg =
+  const msg =
 `📦 NUEVO PEDIDO
+🏪 TIENDA: ${CONFIG.store_name || "PideLink"}
 👤 CLIENTE: ${nombre}
 📞 TELÉFONO: ${tlf}
 📍 DIRECCIÓN: ${addr}
@@ -432,18 +455,55 @@
 🛍️ PEDIDO:
 ${lista}
 📝 NOTAS: ${notas || "Ninguna"}
-💰 TOTAL: ${money(total)}
+💰 TOTAL: ${fmtMoney(total)}
 ------------------
 ✅ Confirma recepción y envía enlace de pago.`;
 
-    window.open(`https://wa.me/${WHATSAPP_VENDEDOR}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
-  }
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
+}
 
-  /** INIT */
+/** Persistence */
+function saveState(){
+  const payload = {
+    carrito,
+    ui: { categoriaActual, busqueda },
+    form: {
+      notes: document.getElementById('cust-notes').value,
+      name: document.getElementById('cust-name').value,
+      phone: document.getElementById('cust-phone').value,
+      address: document.getElementById('cust-address').value
+    }
+  };
+  localStorage.setItem(LS_KEY, JSON.stringify(payload));
+}
+function loadState(){
+  try{
+    const s = JSON.parse(localStorage.getItem(LS_KEY));
+    if(s?.carrito) carrito = s.carrito;
+    if(s?.ui){
+      categoriaActual = s.ui.categoriaActual || categoriaActual;
+      busqueda = s.ui.busqueda || "";
+      document.getElementById("search").value = busqueda;
+    }
+    if(s?.form){
+      document.getElementById('cust-notes').value = s.form.notes || "";
+      document.getElementById('cust-name').value = s.form.name || "";
+      document.getElementById('cust-phone').value = s.form.phone || "";
+      document.getElementById('cust-address').value = s.form.address || "";
+    }
+  }catch(e){}
+}
+
+/** Init */
+(async function init(){
   loadState();
-  setActiveCatBtn(categoriaActual);
-  renderGrid();
-  updateCart();
+  try{
+    await loadFromSheets();
+  }catch(e){
+    console.error(e);
+    document.getElementById("load-error").classList.remove("hidden");
+  }
+})();
 </script>
 
 </body>
